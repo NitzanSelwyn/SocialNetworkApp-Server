@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,10 +11,22 @@ namespace SocialProjectServer.Controllers
 {
     public class ValuesController : ApiController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
+        [Route("api/test")]
+        [HttpPost]
+        public void Get()
         {
-            return new string[] { "value1", "value2" };
+            AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig();
+            clientConfig.ServiceURL = "http://localhost:8000";
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(clientConfig);
+
+            client.PutItemAsync(new PutItemRequest
+            {
+                TableName = "user",
+                Item = new Dictionary<string, AttributeValue>
+                {
+                    { "name",new AttributeValue{S = "Tanzania" } },
+                }
+            });
         }
 
         // GET api/values/5

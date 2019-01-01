@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amazon.DynamoDBv2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,11 +9,11 @@ namespace SocialProjectServer.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public void Index()
         {
-            ViewBag.Title = "Home Page";
-
-            return View();
+            AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig();
+            clientConfig.ServiceURL = "http://localhost:8000";
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(clientConfig);
         }
     }
 }

@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace DAL.Services
 {
-    class DynamoDBService 
+    public class DynamoDBService
     {
-        DynamoDBContext dynamoDBContext;
-        AmazonDynamoDBClient dynamoDBClient;
+        private readonly DynamoDBContext dynamoDBContext;
+        private readonly AmazonDynamoDBClient dynamoDBClient;
 
         public DynamoDBService()
         {
@@ -21,8 +21,12 @@ namespace DAL.Services
             {
                 ConsistentRead = true,
                 SkipVersionCheck = true
-            
             });
         }
+
+        //public void Login(string userName, string password)
+        //{
+        //     dynamoDBContext.Query(hashKeyValue: userName);
+        //}
     }
 }
