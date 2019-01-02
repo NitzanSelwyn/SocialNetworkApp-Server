@@ -22,10 +22,16 @@ namespace SocialProjectServer.Containers
             {
                 container = new Container();
                 container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+                //Services
                 container.Register<IHttpClient, HttpClientSender>(Lifestyle.Singleton);
-                container.Register<INetworkRepository, NetworkRepository>(Lifestyle.Singleton);
-                container.Register<IUsersManager, UsersManager>(Lifestyle.Singleton);
+
+                //Databases
                 container.Register<INetworkDatabase, DynamoDB>(Lifestyle.Singleton);
+                container.Register<INetworkRepository, NetworkRepository>(Lifestyle.Singleton);
+
+                //Managers
+                container.Register<IUsersManager, UsersManager>(Lifestyle.Singleton);
             }
 
         }
