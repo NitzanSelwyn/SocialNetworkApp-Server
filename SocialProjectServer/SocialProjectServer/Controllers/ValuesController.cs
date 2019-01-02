@@ -1,4 +1,5 @@
 ﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
 using System;
 using System.Collections.Generic;
@@ -12,23 +13,56 @@ namespace SocialProjectServer.Controllers
     public class ValuesController : ApiController
     {
         [Route("api/test")]
-        [HttpPost]
-        public void Get()
+        [HttpGet]
+        public string Get()
         {
             AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig();
-            clientConfig.ServiceURL = "http://localhost:8000";
+            //    clientConfig.ServiceURL = "http://localhost:8000";
             AmazonDynamoDBClient client = new AmazonDynamoDBClient(clientConfig);
-
-            client.PutItemAsync(new PutItemRequest
+            string tableName = "users";
+            var request = new CreateTableRequest
             {
-                TableName = "user",
-                Item = new Dictionary<string, AttributeValue>
-                {
-                    { "name",new AttributeValue{S = "Tanzania" } },
-                }
-            });
-        }
+                AttributeDefinitions = new List<AttributeDefinition>()
+                ,
 
+                TableName = tableName
+            };
+
+
+            var response = client.CreateTable(request);
+            Table usersTable = Table.LoadTable(client, tableName);
+
+            Document user = new Document();
+            user["id"] = 1;
+            user["name"] = "shahaf";
+            user["password"] = "dahan";
+            usersTable.PutItem(user);
+            GetItemOperationConfig config = new GetItemOperationConfig
+            {
+                AttributesToGet = new List<string> { "id", "name", "password" },
+                ConsistentRead = true
+            };
+            Document doc = usersTable.GetItem(1, config);
+            return PrintDocument(doc);
+        }
+        private string PrintDocument(Document updatedDocument)
+        {
+            string returnStr = "";
+            foreach (var attribute in updatedDocument.GetAttributeNames())
+            {
+                string stringValue = null;
+                var value = updatedDocument[attribute];
+                if (value is Primitive)
+                    stringValue = value.AsPrimitive().Value.ToString();
+                else if (value is PrimitiveList)
+                    stringValue = string.Join(",", (from primitive
+                                    in value.AsPrimitiveList().Entries
+                                                    select primitive.Value).ToArray());
+                returnStr += $"{attribute}- {stringValue} \n";
+
+            }
+            return returnStr;
+        }
         // GET api/values/5
         public string Get(int id)
         {
