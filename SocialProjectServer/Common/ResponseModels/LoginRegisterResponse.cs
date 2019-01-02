@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Common.ResponseModels
 {
-    public class LoginResponse
+    public class LoginRegisterResponse
     {
         public string token { get; set; }
         public ResponseEnum status { get; set; }
-        public LoginResponse(string token,ResponseEnum status)
+        public LoginRegisterResponse(string token,ResponseEnum status)
         {
             this.token = token;
             this.status = status;

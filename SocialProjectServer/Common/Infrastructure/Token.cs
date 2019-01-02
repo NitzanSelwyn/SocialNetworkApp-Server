@@ -8,22 +8,22 @@ namespace Common.Infrastructure
 {
     public class Token
     {
-        public Token(string id)
+        public Token(string Id)
         {
-            this.id = id;
+            this.Id = Id;
             GenerateToken();
         }
 
         private void GenerateToken()
         {
             //generates the new token
-            token = Guid.NewGuid().ToString();
-            lastUsed = DateTime.Now;
+            tokenKey = Guid.NewGuid().ToString();
+            LastUsed = DateTime.Now;
         }
 
-        public string token { get; set; }
-        public string id { get; set; }
-        public DateTime lastUsed { get; set; }
+        public string tokenKey { get; set; }
+        public string Id { get; set; }
+        public DateTime LastUsed { get; set; }
 
 
     }

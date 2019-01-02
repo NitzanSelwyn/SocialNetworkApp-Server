@@ -20,15 +20,15 @@ namespace AuthService
         {
             //returns a new token after adding it to the collection
             Token newToken = new Token(userId);
-            TokensCollection[newToken.token] = newToken;
-            return newToken.token;
+            TokensCollection[newToken.tokenKey] = newToken;
+            return newToken.tokenKey;
         }
         public bool IsTokenValid(string token)
         {
             //checks if the token is valid
             if (TokenExists(token))
             {
-                if (TokenIsActive(TokensCollection[token].lastUsed))
+                if (TokenIsActive(TokensCollection[token].LastUsed))
                 {
                     UpdateTokenOnUse(token);
                     return true;
@@ -40,7 +40,7 @@ namespace AuthService
         private void UpdateTokenOnUse(string token)
         {
             //updates the token's last used
-            TokensCollection[token].lastUsed = DateTime.Now;
+            TokensCollection[token].LastUsed = DateTime.Now;
         }
 
         private bool TokenExists(string token)
@@ -53,6 +53,11 @@ namespace AuthService
         {
             //checks if the token is still active
             return lastUsed.AddMinutes(MainConfigs.TokenTTL) >= DateTime.Now;
+        }
+        private string GetUserId(string token)
+        {
+            //returns the user id that matches this token
+            return TokensCollection[token].Id;
         }
     }
 }

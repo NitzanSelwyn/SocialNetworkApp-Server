@@ -41,17 +41,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configs\DatabaseConfigs.cs" />
     <Compile Include="Configs\MainConfigs.cs" />
     <Compile Include="Configs\RouteConfigs.cs" />
-    <Compile Include="Contracts\IAuthService.cs" />
-    <Compile Include="Contracts\IHttpClient.cs" />
+    <Compile Include="Contracts\Services\IAuthService.cs" />
+    <Compile Include="Contracts\Services\IHttpClient.cs" />
     <Compile Include="Contracts\INetworkRepository.cs" />
-    <Compile Include="Contracts\IUsersManager.cs" />
+    <Compile Include="Contracts\Managers\IUsersManager.cs" />
     <Compile Include="Enums\ResponseEnum.cs" />
     <Compile Include="Infrastructure\Token.cs" />
-    <Compile Include="Model\User.cs" />
+    <Compile Include="Models\TempModels\UserRegister.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResponseModels\LoginResponse.cs" />
+    <Compile Include="ResponseModels\LoginRegisterResponse.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,8 @@
 ﻿using BL.Managers;
 using Common.Contracts;
+using Common.Contracts.Databases;
 using DAL;
+using DAL.Databases;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using SocialProjectServer.Services;
@@ -23,6 +25,7 @@ namespace SocialProjectServer.Containers
                 container.Register<IHttpClient, HttpClientSender>(Lifestyle.Singleton);
                 container.Register<INetworkRepository, NetworkRepository>(Lifestyle.Singleton);
                 container.Register<IUsersManager, UsersManager>(Lifestyle.Singleton);
+                container.Register<INetworkDatabase, DynamoDB>(Lifestyle.Singleton);
             }
 
         }

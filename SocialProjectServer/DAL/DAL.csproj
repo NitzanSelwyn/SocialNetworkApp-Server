@@ -47,9 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NetworkRepository.cs" />
+    <Compile Include="Databases\DynamoDB.cs" />
+    <Compile Include="Databases\INetworkDatabase.cs" />
+    <Compile Include="Repostiories\NetworkRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\DynamoDBService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

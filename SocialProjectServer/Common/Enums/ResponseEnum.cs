@@ -8,8 +8,7 @@ namespace Common.Enums
 {
     public enum ResponseEnum
     {
-        Valid,
-        Unvalid,
-        Unauthorized
+        Succeeded,
+        Failed,
     }
 }
