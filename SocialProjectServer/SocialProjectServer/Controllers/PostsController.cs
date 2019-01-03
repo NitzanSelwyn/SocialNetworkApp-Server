@@ -1,14 +1,17 @@
-﻿using Amazon.DynamoDBv2;
+﻿using Amazon;
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using Common.Configs;
 using Common.Models;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.IO;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace SocialProjectServer.Controllers
@@ -20,6 +23,14 @@ namespace SocialProjectServer.Controllers
         CreateTableResponse response;
         Table usersTable;
         Document _post;
+
+        static AmazonS3Client s3Client = new AmazonS3Client();
+
+        private const string bucketName = "socialprojectimages";
+        private const string keyName = "";
+        private const string filePath = "";
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
+        //     private static IAmazonS3 s3Client;
 
         public PostsController()
         {
@@ -33,24 +44,32 @@ namespace SocialProjectServer.Controllers
                 TableName = tableName
             };
 
-             response = client.CreateTable(request);
-             usersTable = Table.LoadTable(client, tableName);
+            response = client.CreateTable(request);
+            usersTable = Table.LoadTable(client, tableName);
 
-             _post = new Document();
+            _post = new Document();
 
         }
 
         [HttpPost]
         [Route(RouteConfigs.PostNewMessage)]
-        public void AddNewPost([FromBody]Post post)
+        public async void AddNewPost()
         {
             //TODO
-            _post["Author"] = post.Author;
+            Post post = new Post
+            {
+                Author = "nitzan",
+                Content = "amalh",
+                ImageLink = @"C:\Users\Nitzan's PC\Downloads\MEME\7qyzofpyfcv01.jpg",
+                Like = 12
+            };
 
+            _post["Author"] = post.Author;
+            _post["Content"] = post.Content;
+            _post["Likes"] = post.Like;
+            _post["Image"] = UploadFileAsync(post.ImageLink,post.ImageLink);
 
             usersTable.PutItem(_post);
-
-
         }
 
         [HttpGet]
@@ -84,5 +103,47 @@ namespace SocialProjectServer.Controllers
             //TODO
             throw new NotImplementedException();
         }
+
+        private static string UploadFileAsync(string filePath,string fileName)
+        {
+            s3Client = new AmazonS3Client(bucketRegion);
+
+            s3Client.PutACL(new PutACLRequest
+            {
+                BucketName = "socialprojectimages",
+                Key = "name",
+                CannedACL = S3CannedACL.PublicRead,
+            });
+
+            try
+            {
+
+                PutObjectRequest putRequest = new PutObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = fileName,
+                    FilePath = filePath,
+                    ContentType = "text/plain"
+                };
+
+                var response = s3Client.PutObject(putRequest);
+
+                return "File Location";
+
+            }
+            
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            return null ;
+
+        }
+
     }
 }
+

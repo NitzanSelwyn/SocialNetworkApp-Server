@@ -6,16 +6,11 @@ using System.Threading.Tasks;
 
 namespace Common.Models
 {
-    public class Post
+    public class Comment
     {
-
         public string Author { get; set; }
 
         public string Content { get; set; }
-
-        //public List<Comment> Comments { get; set; }
-
-        public string ImageLink { get; set; }
 
         public int Like { get; set; }
     }

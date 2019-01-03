@@ -16,12 +16,12 @@ namespace SocialProjectServer.Containers
 {
     public static class ServerContainer
     {
-        public static readonly Container container;
+        public static readonly SimpleInjector.Container container;
         static ServerContainer()
         {
             if (container == null)
             {
-                container = new Container();
+                container = new SimpleInjector.Container();
                 container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
                 //Services
