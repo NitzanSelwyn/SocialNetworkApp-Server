@@ -1,5 +1,9 @@
-﻿using Common.Configs;
+﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
+using Common.Configs;
 using Common.Models;
+using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +15,47 @@ namespace SocialProjectServer.Controllers
 {
     public class PostsController : ApiController
     {
+        AmazonDynamoDBConfig clientConfig;
+        AmazonDynamoDBClient client;
+        CreateTableResponse response;
+        Table usersTable;
+        Document _post;
+
+        public PostsController()
+        {
+            clientConfig = new AmazonDynamoDBConfig();
+
+            client = new AmazonDynamoDBClient(clientConfig);
+            string tableName = "Posts";
+            var request = new CreateTableRequest
+            {
+                AttributeDefinitions = new List<AttributeDefinition>(),
+                TableName = tableName
+            };
+
+             response = client.CreateTable(request);
+             usersTable = Table.LoadTable(client, tableName);
+
+             _post = new Document();
+
+        }
+
         [HttpPost]
         [Route(RouteConfigs.PostNewMessage)]
-        public bool AddNewPost([FromBody]Post post)
+        public void AddNewPost([FromBody]Post post)
         {
             //TODO
-            throw new NotImplementedException();
- 
+            _post["Author"] = post.Author;
+
+
+            usersTable.PutItem(_post);
+
+
         }
 
         [HttpGet]
         [Route(RouteConfigs.GetUsersPosts)]
-        public List<Post> GetUserPosts([FromBody]Models.User user)
+        public List<Post> GetUserPosts([FromBody]User user)
         {
             //TODO
             throw new NotImplementedException();
@@ -30,7 +63,7 @@ namespace SocialProjectServer.Controllers
 
         [HttpGet]
         [Route(RouteConfigs.GetFolowersPosts)]
-        public List<Post> GetFolowersPosts([FromBody]Models.User user)
+        public List<Post> GetFolowersPosts([FromBody]User user)
         {
             //TODO
             throw new NotImplementedException();

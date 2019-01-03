@@ -8,5 +8,6 @@ namespace Common.Models
 {
     public class Post
     {
+        public string Author { get; set; }
     }
 }

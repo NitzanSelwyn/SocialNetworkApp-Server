@@ -51,7 +51,7 @@ namespace DAL
                 networkDb.GetUsersTable().PutItem(newUser);
                 return ResponseEnum.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return ResponseEnum.Failed;
             }

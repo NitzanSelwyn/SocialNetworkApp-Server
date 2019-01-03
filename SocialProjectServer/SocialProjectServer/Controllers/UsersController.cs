@@ -40,20 +40,21 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
-     //  [HttpPost]
-     //  [Route(RouteConfigs.UserRegister)]
-     //  public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
-     //  {
-     //      //tries a new user's registration
-     //
-     //  }
-     [HttpPost]
-     [Route(RouteConfigs.UsernameExists)]
-     public IHttpActionResult IsUsernameExists([FromBody]string userName)
+        //  [HttpPost]
+        //  [Route(RouteConfigs.UserRegister)]
+        //  public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
+        //  {
+        //      //tries a new user's registration
+        //
+        //  }
+        [HttpPost]
+        [Route(RouteConfigs.UsernameExists)]
+        public IHttpActionResult IsUsernameExists([FromBody]string userName)
         {
             //checks if the username exists
             return Ok(usersManager.IsUsernameExists(userName));
         }
+
         public string GetToken(string id)
         {
             //returns a token on user's registeration/login

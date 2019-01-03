@@ -45,6 +45,7 @@ namespace SocialProjectServer.Controllers
             Document doc = usersTable.GetItem(1, config);
             return PrintDocument(doc);
         }
+
         private string PrintDocument(Document updatedDocument)
         {
             string returnStr = "";
