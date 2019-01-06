@@ -9,10 +9,10 @@ namespace Common.Configs
     public static class RouteConfigs
     {
         public const string GetTokenRoute = "Api/Auth/GetToken";
-        public const string ValidateToken = "Api/Auth/ValidateToken";
+        public const string ValidateTokenRoute = "Api/Auth/ValidateToken";
 
-        public const string UserLogin = "Api/Users/UserLogin";
-        public const string UserRegister = "Api/Users/UserRegister";
-        public const string UsernameExists = "Api/Users/UsernameExists";
+        public const string UserLoginRoute = "Api/Users/UserLogin";
+        public const string UserRegisterRoute = "Api/Users/UserRegister";
+        public const string UsernameExistsRoute = "Api/Users/UsernameExists";
     }
 }

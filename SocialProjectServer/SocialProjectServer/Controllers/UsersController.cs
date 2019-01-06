@@ -25,7 +25,7 @@ namespace SocialProjectServer.Controllers
         }
 
         [HttpPost]
-        [Route(RouteConfigs.UserLogin)]
+        [Route(RouteConfigs.UserLoginRoute)]
         public IHttpActionResult UserLogin([FromBody]UserLogin userLogin)
         {
             //user's login
@@ -41,14 +41,14 @@ namespace SocialProjectServer.Controllers
             }
         }
      [HttpPost]
-     [Route(RouteConfigs.UserRegister)]
+     [Route(RouteConfigs.UserRegisterRoute)]
      public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
      {
             //tries a new user's registration
             return Ok();
      }
      [HttpPost]
-     [Route(RouteConfigs.UsernameExists)]
+     [Route(RouteConfigs.UsernameExistsRoute)]
      public IHttpActionResult IsUsernameExists([FromBody]string userName)
         {
             //checks if the username exists
@@ -70,7 +70,7 @@ namespace SocialProjectServer.Controllers
         public bool ValidateToken(string token)
         {
             //validates the token and updates it upon use
-            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.ValidateToken, token);
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.ValidateTokenRoute, token);
             if (returnTuple.Item2 == HttpStatusCode.OK)
             {
                 return Convert.ToBoolean(returnTuple.Item1);
