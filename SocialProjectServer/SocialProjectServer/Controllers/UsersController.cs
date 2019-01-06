@@ -40,13 +40,13 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
-     //  [HttpPost]
-     //  [Route(RouteConfigs.UserRegister)]
-     //  public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
-     //  {
-     //      //tries a new user's registration
-     //
-     //  }
+     [HttpPost]
+     [Route(RouteConfigs.UserRegister)]
+     public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
+     {
+            //tries a new user's registration
+            return Ok();
+     }
      [HttpPost]
      [Route(RouteConfigs.UsernameExists)]
      public IHttpActionResult IsUsernameExists([FromBody]string userName)
