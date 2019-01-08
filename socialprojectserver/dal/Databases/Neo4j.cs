@@ -29,12 +29,14 @@ namespace DAL.Databases
         {
             using (var session = _driver.Session())
             {
-                var results = session.Run($"CREATE(p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\"," +
-                    $"ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})")
-                    .Consume();
+                var results = session.Run($"MATCH (u:User)" +
+                                          $"WHERE u.Username = \"{post.Author}\"" +
+                                          $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})" +
+                                          $"CREATE (u)-[:Posted]->(p)" +                                    
+                                          $"RETURN *")
+                                          .Consume();
             }
         }
-
         public List<Post> GetUserPosts(User user)
         {
             List<Post> postList = new List<Post>();
@@ -57,7 +59,6 @@ namespace DAL.Databases
                 }
             }
         }
-
         public List<Post> GetFolowersPosts(User user)
         {
             List<Post> postList = new List<Post>();

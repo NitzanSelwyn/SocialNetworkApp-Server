@@ -43,15 +43,15 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        [HttpGet]
-        [Route(RouteConfigs.GetUsersPosts)]
-        public List<Post> GetUserPosts([FromBody]User user)
-        {
-            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
-            {
-                return graphContext.GetUserPosts(user);
-            }
-        }
+        //[HttpGet]
+        //[Route(RouteConfigs.GetUsersPosts)]
+        //public List<Post> GetUserPosts([FromBody]User user)
+        //{
+        //    using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+        //    {
+        //        return graphContext.GetUserPosts(user);
+        //    }
+        //}
 
         [HttpGet]
         [Route(RouteConfigs.GetFolowersPosts)]
