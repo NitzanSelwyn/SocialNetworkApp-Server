@@ -17,7 +17,7 @@ namespace AuthService.Controllers
         {
             authService = AuthContainer.container.GetInstance<IAuthService>();
         }
-        [Route(RouteConfigs.GetTokenRoute)]
+        [Route(RouteConfigs.GetTokenInsideRoute)]
         [HttpPost]
         public string GetToken([FromBody]string userId)
         {
@@ -25,11 +25,18 @@ namespace AuthService.Controllers
             return authService.GetNewToken(userId);
         }
 
-        [Route(RouteConfigs.ValidateToken)]
+        [Route(RouteConfigs.ValidateTokenInsideRoute)]
         public bool IsTokenValid([FromBody]string token)
         {
             //validates and update the token's last used
             return authService.IsTokenValid(token);
+        }
+        [HttpPost]
+        [Route(RouteConfigs.GetUserIdByTokenRoute)]
+        public string GetUsernameByToken([FromBody]string token)
+        {
+            //returns the userid that matches this token
+            return authService.GetUserId(token);
         }
     }
 }

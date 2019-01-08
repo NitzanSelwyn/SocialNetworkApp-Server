@@ -40,24 +40,32 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
-     [HttpPost]
-     [Route(RouteConfigs.UserRegisterRoute)]
-     public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
-     {
+        [HttpPost]
+        [Route(RouteConfigs.UserRegisterRoute)]
+        public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
+        {
             //tries a new user's registration
-            return Ok();
-     }
-     [HttpPost]
-     [Route(RouteConfigs.UsernameExistsRoute)]
-     public IHttpActionResult IsUsernameExists([FromBody]string userName)
+            User user = usersManager.TryRegister(userRegister);
+            string token = "";
+            if (user != null)
+            {
+                token = GetToken(user.Username);
+            }
+            return Ok(new LoginRegisterResponse(token, user));
+        }
+        [HttpPost]
+        [Route(RouteConfigs.UsernameExistsRoute)]
+        public IHttpActionResult IsUsernameExists([FromBody]string userName)
         {
             //checks if the username exists
             return Ok(usersManager.IsUsernameExists(userName));
         }
-        public string GetToken(string id)
+        [HttpPost]
+        [Route(RouteConfigs.GetTokenRoute)]
+        public string GetToken([FromBody]string id)
         {
             //returns a token on user's registeration/login
-            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.GetTokenRoute, id);
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.GetTokenInsideRoute, id);
             if (returnTuple.Item2 == HttpStatusCode.OK)
             {
                 return returnTuple.Item1.ToString();
@@ -67,10 +75,12 @@ namespace SocialProjectServer.Controllers
                 return string.Empty;
             }
         }
-        public bool ValidateToken(string token)
+        [HttpPost]
+        [Route(RouteConfigs.ValidateTokenRoute)]
+        public bool ValidateToken([FromBody]string token)
         {
             //validates the token and updates it upon use
-            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.ValidateTokenRoute, token);
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.ValidateTokenInsideRoute, token);
             if (returnTuple.Item2 == HttpStatusCode.OK)
             {
                 return Convert.ToBoolean(returnTuple.Item1);
@@ -79,6 +89,22 @@ namespace SocialProjectServer.Controllers
             {
                 return false;
             }
+        }
+        [HttpPost]
+        [Route(RouteConfigs.GetMyUserRoute)]
+        public IHttpActionResult GetUserByToken([FromBody]string token)
+        {
+            //returns the users that matches this token
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.GetUserIdByTokenRoute, token);
+            if (returnTuple.Item2 == HttpStatusCode.OK)
+            {
+                return Ok(usersManager.GetUserById(returnTuple.Item1.ToString()));
+            }
+            else
+            {
+                return Conflict();
+            }
+
         }
     }
 }

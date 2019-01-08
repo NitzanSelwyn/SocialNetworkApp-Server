@@ -8,9 +8,13 @@ namespace Common.Configs
 {
     public static class RouteConfigs
     {
-        public const string GetTokenRoute = "Api/Auth/GetToken";
-        public const string ValidateTokenRoute = "Api/Auth/ValidateToken";
+        public const string GetUserIdByTokenRoute = "Api/Auth/GetUsernameByToken";
+        public const string GetTokenInsideRoute = "Api/Auth/GetInsideToken";
+        public const string ValidateTokenInsideRoute = "Api/Auth/ValidateInsideToken";
+        public const string GetTokenRoute = "Api/Users/GetToken";
+        public const string ValidateTokenRoute = "Api/Users/ValidateToken";
 
+        public const string GetMyUserRoute = "Api/users/GetUserByToken";
         public const string UserLoginRoute = "Api/Users/UserLogin";
         public const string UserRegisterRoute = "Api/Users/UserRegister";
         public const string UsernameExistsRoute = "Api/Users/UsernameExists";

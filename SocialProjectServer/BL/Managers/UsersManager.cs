@@ -1,6 +1,7 @@
 ﻿using Common.Contracts;
 using Common.Enums;
 using Common.Models.TempModels;
+using Common.ResponseModels;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace BL.Managers
             //checks if the username exists
             return repository.GetUserById(userName.ToLower()) != null;
         }
-        public ResponseEnum TryRegister(UserRegister userRegister)
+        public User TryRegister(UserRegister userRegister)
         {
             //tries a user registration
             return repository.RegisterUser(userRegister);

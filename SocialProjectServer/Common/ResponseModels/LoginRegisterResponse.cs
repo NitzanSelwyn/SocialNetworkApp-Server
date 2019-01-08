@@ -10,6 +10,10 @@ namespace Common.ResponseModels
 {
     public class LoginRegisterResponse
     {
+        public LoginRegisterResponse()
+        {
+                
+        }
         public string token { get; set; }
         public User user { get; set; }
         public LoginRegisterResponse(string token, User user)

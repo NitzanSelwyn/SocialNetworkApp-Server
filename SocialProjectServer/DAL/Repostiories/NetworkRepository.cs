@@ -34,7 +34,7 @@ namespace DAL
                 return null;
             }
         }
-        public ResponseEnum RegisterUser(UserRegister userRegister)
+        public User RegisterUser(UserRegister userRegister)
         {
             //registers the users
             try
@@ -49,11 +49,11 @@ namespace DAL
                 newUser["Address"] = userRegister.Address;
                 newUser["WorkLocation"] = userRegister.WorkLocation;
                 networkDb.GetUsersTable().PutItem(newUser);
-                return ResponseEnum.Succeeded;
+                return GetUserById(userRegister.Username);
             }
             catch (Exception e)
             {
-                return ResponseEnum.Failed;
+                return null;
             }
         }
 

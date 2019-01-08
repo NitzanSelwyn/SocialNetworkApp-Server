@@ -10,5 +10,7 @@ namespace Common.Contracts
     {
         string GetNewToken(string userId);
         bool IsTokenValid(string token);
+         string GetUserId(string token);
+       
     }
 }

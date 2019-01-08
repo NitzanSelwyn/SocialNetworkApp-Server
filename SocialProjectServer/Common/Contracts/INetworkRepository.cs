@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Enums;
 using Common.Models.TempModels;
+using Common.ResponseModels;
 using SocialProjectServer.Models;
 
 namespace Common.Contracts
@@ -12,6 +13,6 @@ namespace Common.Contracts
     public interface INetworkRepository
     {
         User GetUserById(string id);
-        ResponseEnum RegisterUser(UserRegister userRegister);
+        User RegisterUser(UserRegister userRegister);
     }
 }

@@ -8,13 +8,12 @@ using System.Web;
 
 namespace AuthService
 {
-    public class AuthService:IAuthService
+    public class AuthService : IAuthService
     {
-        Dictionary<string, Token> TokensCollection;
+        static Dictionary<string, Token> TokensCollection;
         public AuthService()
         {
             TokensCollection = new Dictionary<string, Token>();
-
         }
         public string GetNewToken(string userId)
         {
@@ -54,10 +53,11 @@ namespace AuthService
             //checks if the token is still active
             return lastUsed.AddMinutes(MainConfigs.TokenTTL) >= DateTime.Now;
         }
-        private string GetUserId(string token)
+        public string GetUserId(string token)
         {
             //returns the user id that matches this token
             return TokensCollection[token].Id;
         }
+
     }
 }
