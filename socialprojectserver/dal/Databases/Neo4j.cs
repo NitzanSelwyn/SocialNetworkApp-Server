@@ -29,12 +29,9 @@ namespace DAL.Databases
         {
             using (var session = _driver.Session())
             {
-                using (var tx = session.BeginTransaction())
-                {
-                    IStatementResult results = tx.Run(
-                        @"CREATE(p:Posts)--[:Posted]->(u:User)
-                          WHERE p == $post, u.UserName == p.Author");
-                }
+                var results = session.Run($"CREATE(p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\"," +
+                    $"ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})")
+                    .Consume();
             }
         }
 

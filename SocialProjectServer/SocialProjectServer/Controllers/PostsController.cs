@@ -30,8 +30,14 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.PostNewMessage)]
         public void AddNewPost([FromBody]Post post)
         {
-            var imageLink = UploadFileAsync(post.ImageLink, post.Author);
-            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            post = new Post();
+            post.Author = "Hello";
+            post.Content = "World";
+            post.Like = 69;
+            post.ImageLink = "asdasda";
+
+           // var imageLink = UploadFileAsync(post.ImageLink, post.Author);
+            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "hello", "123456"))
             {
                 graphContext.UploadPost(post);
             }
@@ -60,16 +66,16 @@ namespace SocialProjectServer.Controllers
         [HttpDelete]
         [Route(RouteConfigs.DeletePost)]
         public void DeletePost([FromBody]Post post)
-        {          
+        {
             using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
             {
-                 graphContext.DeletePost(post);
+                graphContext.DeletePost(post);
             }
         }
 
-        private static string UploadFileAsync(string filePath, string id)
+        private static string UploadFileAsync(string filePath, string authorName)
         {
-            var fileName = $"{id}/{DateTime.Now.ToString()}";
+            var fileName = $"{authorName}/{DateTime.Now.ToString()}";
             s3Client = new AmazonS3Client(bucketRegion);
 
             s3Client.PutACL(new PutACLRequest
