@@ -17,7 +17,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <Use64BitIISExpress>true</Use64BitIISExpress>
+    <Use64BitIISExpress>
+    </Use64BitIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -52,7 +53,13 @@
     <Reference Include="AWSSDK.DynamoDBv2, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.DynamoDBv2.3.3.16\lib\net45\AWSSDK.DynamoDBv2.dll</HintPath>
     </Reference>
+    <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.S3.3.3.31.5\lib\net45\AWSSDK.S3.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Neo4j.Driver, Version=1.7.91.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Neo4j.Driver.1.7.0\lib\net452\Neo4j.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleInjector, Version=4.4.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <HintPath>..\packages\SimpleInjector.4.4.3\lib\net45\SimpleInjector.dll</HintPath>
     </Reference>
@@ -173,7 +180,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Containers\ServerContainer.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PostsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -265,10 +272,6 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BL\BL.csproj">
-      <Project>{09F0E14C-E313-49CB-84A6-05EB9E8B200D}</Project>
-      <Name>BL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{8cdc6064-adaf-4e63-96ab-6ccaf9763656}</Project>
       <Name>Common</Name>
@@ -280,6 +283,7 @@
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.3.3.16\analyzers\dotnet\cs\AWSSDK.DynamoDBv2.CodeAnalysis.dll" />
+    <Analyzer Include="..\packages\AWSSDK.S3.3.3.31.5\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

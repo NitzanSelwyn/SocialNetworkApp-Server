@@ -51,7 +51,7 @@ namespace DAL
                 networkDb.GetUsersTable().PutItem(newUser);
                 return GetUserById(userRegister.Username);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
