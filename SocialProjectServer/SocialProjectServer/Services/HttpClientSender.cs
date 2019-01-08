@@ -29,7 +29,7 @@ namespace SocialProjectServer.Services
                     object result = response.Content.ReadAsAsync(typeof(object)).Result;
                     return new Tuple<object, HttpStatusCode>(result, response.StatusCode);
                 }
-                catch (AggregateException e)
+                catch (AggregateException)
                 {
 
                     return new Tuple<object, HttpStatusCode>(null, HttpStatusCode.ExpectationFailed);
@@ -49,7 +49,7 @@ namespace SocialProjectServer.Services
                     object result = response.Content.ReadAsAsync(typeof(object)).Result;
                     return new Tuple<object, HttpStatusCode>(result, response.StatusCode);
                 }
-                catch (AggregateException e)
+                catch (AggregateException)
                 {
                     return new Tuple<object, HttpStatusCode>(null, HttpStatusCode.ExpectationFailed);
                 }
