@@ -23,6 +23,7 @@ namespace SocialProjectServer.Models
             this.WorkLocation = WorkLocation;
 
         }
+        public string ID { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -31,5 +32,7 @@ namespace SocialProjectServer.Models
         public DateTime BirthDate { get; set; }
         public string Address { get; set; }
         public string WorkLocation { get; set; }
+        public List<string> Following { get; set; }
+        public List<string> Blocking { get; set; }
     }
 }

@@ -7,9 +7,11 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Common.Configs;
 using Common.Models;
+using DAL.Databases;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -18,94 +20,56 @@ namespace SocialProjectServer.Controllers
 {
     public class PostsController : ApiController
     {
-        AmazonDynamoDBConfig clientConfig;
-        AmazonDynamoDBClient client;
-        CreateTableResponse response;
-        Table usersTable;
-        Document _post;
-
         static AmazonS3Client s3Client = new AmazonS3Client();
 
         private const string bucketName = "socialprojectimages";
-        private const string keyName = "";
-        private const string filePath = "";
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
-        //     private static IAmazonS3 s3Client;
-
-        public PostsController()
-        {
-            clientConfig = new AmazonDynamoDBConfig();
-
-            client = new AmazonDynamoDBClient(clientConfig);
-            string tableName = "Posts";
-            var request = new CreateTableRequest
-            {
-                AttributeDefinitions = new List<AttributeDefinition>(),
-                TableName = tableName
-            };
-
-            response = client.CreateTable(request);
-            usersTable = Table.LoadTable(client, tableName);
-
-            _post = new Document();
-
-        }
+        private const string baseURL = "https://s3-eu-west-1.amazonaws.com/socialprojectimages/";
 
         [HttpPost]
         [Route(RouteConfigs.PostNewMessage)]
-        public async void AddNewPost()
+        public void AddNewPost([FromBody]Post post)
         {
-            //TODO
-            Post post = new Post
+            var imageLink = UploadFileAsync(post.ImageLink, post.Author);
+            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
             {
-                Author = "nitzan",
-                Content = "amalh",
-                ImageLink = @"C:\Users\Nitzan's PC\Downloads\MEME\7qyzofpyfcv01.jpg",
-                Like = 12
-            };
-
-            _post["Author"] = post.Author;
-            _post["Content"] = post.Content;
-            _post["Likes"] = post.Like;
-            _post["Image"] = UploadFileAsync(post.ImageLink,post.ImageLink);
-
-            usersTable.PutItem(_post);
+                graphContext.UploadPost(post);
+            }
         }
 
         [HttpGet]
         [Route(RouteConfigs.GetUsersPosts)]
-        public List<Post> GetUserPosts([FromBody]User user)
+        public List<User> GetUserPosts([FromBody]User user)
         {
-            //TODO
-            throw new NotImplementedException();
+            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            {
+                return graphContext.GetUserPosts(user);
+            }
         }
 
         [HttpGet]
         [Route(RouteConfigs.GetFolowersPosts)]
         public List<Post> GetFolowersPosts([FromBody]User user)
         {
-            //TODO
-            throw new NotImplementedException();
-        }
-
-        [HttpPut]
-        [Route(RouteConfigs.EditPost)]
-        public bool EditPost([FromBody]Post post)
-        {
-            //TODO
-            throw new NotImplementedException();
+            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            {
+                return graphContext.GetFolowersPosts(user);
+            }
         }
 
         [HttpDelete]
         [Route(RouteConfigs.DeletePost)]
-        public bool DeletePost([FromBody]Post post)
-        {
-            //TODO
-            throw new NotImplementedException();
+        public void DeletePost([FromBody]Post post)
+        {          
+            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            {
+                 graphContext.DeletePost(post);
+            }
         }
 
-        private static string UploadFileAsync(string filePath,string fileName)
+        private static string UploadFileAsync(string filePath, string id)
         {
+            var fileName = $"{id}/{DateTime.Now.ToString()}";
             s3Client = new AmazonS3Client(bucketRegion);
 
             s3Client.PutACL(new PutACLRequest
@@ -123,15 +87,14 @@ namespace SocialProjectServer.Controllers
                     BucketName = bucketName,
                     Key = fileName,
                     FilePath = filePath,
-                    ContentType = "text/plain"
+                    ContentType = "image/png"
+
                 };
 
-                var response = s3Client.PutObject(putRequest);
-
-                return "File Location";
-
+                s3Client.PutObject(putRequest);
+                return baseURL + fileName;
             }
-            
+
             catch (AmazonS3Exception e)
             {
                 Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
@@ -140,10 +103,9 @@ namespace SocialProjectServer.Controllers
             {
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
             }
-            return null ;
+            return null;
 
         }
-
     }
 }
 
