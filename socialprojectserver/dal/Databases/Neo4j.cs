@@ -13,7 +13,6 @@ namespace DAL.Databases
     {
         private readonly IDriver _driver;
 
-
         public Neo4jDB(string uri, string user, string password)
         {
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
@@ -32,33 +31,32 @@ namespace DAL.Databases
                 var results = session.Run($"MATCH (u:User)" +
                                           $"WHERE u.Username = \"{post.Author}\"" +
                                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})" +
-                                          $"CREATE (u)-[:Posted]->(p)" +                                    
+                                          $"CREATE (u)-[:Posted]->(p)" +
                                           $"RETURN *")
                                           .Consume();
             }
         }
+
         public List<Post> GetUserPosts(User user)
         {
             List<Post> postList = new List<Post>();
             using (var session = _driver.Session())
             {
-                using (var tx = session.BeginTransaction())
-                {
-                    IStatementResult results = tx.Run(
-                        @"MATCH (u:Users)--[:Posted]->(p:Posts)
-                          RETURN p,
-                          ORDER BY p.DatePosted DESC");
+                var results = session.Run(
+                    $"MATCH (u:User)-[:Posted]->(p:Post)" +
+                    $"RETURN p ORDER BY p.DatePosted DESC");
+
                     foreach (IRecord result in results)
                     {
                         var node = result["p"].As<INode>();
-                        var post = node.Properties["PostID"]?.As<Post>();
+                        var post = node.Properties["Author"]?.As<Post>();
 
                         postList.Add(post);
                     }
-                    return postList;
-                }
+                    return postList;               
             }
         }
+
         public List<Post> GetFolowersPosts(User user)
         {
             List<Post> postList = new List<Post>();

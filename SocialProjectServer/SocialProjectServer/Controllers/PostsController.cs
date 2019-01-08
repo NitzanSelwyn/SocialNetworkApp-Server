@@ -30,28 +30,25 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.PostNewMessage)]
         public void AddNewPost([FromBody]Post post)
         {
-            post = new Post();
-            post.Author = "Hello";
-            post.Content = "World";
-            post.Like = 69;
-            post.ImageLink = "asdasda";
 
-           // var imageLink = UploadFileAsync(post.ImageLink, post.Author);
+            var imageLink = UploadFileAsync(post.ImageLink, post.Author);
+            post.ImageLink = imageLink;
+
             using (var graphContext = new Neo4jDB("bolt://localhost:7687", "hello", "123456"))
             {
                 graphContext.UploadPost(post);
             }
         }
 
-        //[HttpGet]
-        //[Route(RouteConfigs.GetUsersPosts)]
-        //public List<Post> GetUserPosts([FromBody]User user)
-        //{
-        //    using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
-        //    {
-        //        return graphContext.GetUserPosts(user);
-        //    }
-        //}
+        [HttpGet]
+        [Route(RouteConfigs.GetUsersPosts)]
+        public List<Post> GetUserPosts([FromBody]User user)
+        {
+            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            {
+                return graphContext.GetUserPosts(user);
+            }
+        }
 
         [HttpGet]
         [Route(RouteConfigs.GetFolowersPosts)]
@@ -73,7 +70,7 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        private static string UploadFileAsync(string filePath, string authorName)
+        private static  string UploadFile(string filePath, string authorName)
         {
             var fileName = $"{authorName}/{DateTime.Now.ToString()}";
             s3Client = new AmazonS3Client(bucketRegion);
@@ -97,7 +94,7 @@ namespace SocialProjectServer.Controllers
 
                 };
 
-                s3Client.PutObject(putRequest);
+                 s3Client.PutObject(putRequest);
                 return baseURL + fileName;
             }
 
