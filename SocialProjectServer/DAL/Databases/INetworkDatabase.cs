@@ -1,14 +1,11 @@
 ﻿using Amazon.DynamoDBv2.DocumentModel;
-using Common.Enums;
-using Common.Models.TempModels;
-using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Common.Contracts.Databases
+namespace DAL.Databases
 {
     public interface INetworkDatabase
     {

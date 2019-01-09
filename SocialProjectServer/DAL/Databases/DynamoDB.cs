@@ -1,11 +1,6 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Common.Configs;
-using Common.Contracts.Databases;
-using Common.Enums;
-using Common.Models.TempModels;
-using Common.ResponseModels;
-using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Databases
 {
-    public class DynamoDB : INetworkDatabase
+   public class DynamoDB : INetworkDatabase
     {
         AmazonDynamoDBConfig clientConfig { get; set; }
         AmazonDynamoDBClient client { get; set; }

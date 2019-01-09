@@ -25,16 +25,18 @@ namespace SocialProjectServer.Controllers
         private const string bucketName = "socialprojectimages";
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
         private const string baseURL = "https://s3-eu-west-1.amazonaws.com/socialprojectimages/";
+        private const string neo4jDBConnectionString = "bolt://ec2-34-245-150-157.eu-west-1.compute.amazonaws.com:7687";
+        private const string neo4jDBUserName = "neo4j";
+        private const string neo4jDBPassword = "123456";
 
         [HttpPost]
         [Route(RouteConfigs.PostNewMessage)]
         public void AddNewPost([FromBody]Post post)
-        {
+        { 
+            //var imageLink = UploadFileAsync(post.ImageLink, post.Author);
+            //post.ImageLink = imageLink;
 
-            var imageLink = UploadFile(post.ImageLink, post.Author);
-            post.ImageLink = imageLink;
-
-            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "hello", "123456"))
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
                 graphContext.UploadPost(post);
             }
@@ -44,7 +46,7 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.GetUsersPosts)]
         public List<Post> GetUserPosts([FromBody]User user)
         {
-            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
                 return graphContext.GetUserPosts(user);
             }
@@ -54,7 +56,7 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.GetFolowersPosts)]
         public List<Post> GetFolowersPosts([FromBody]User user)
         {
-            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
                 return graphContext.GetFolowersPosts(user);
             }
@@ -64,7 +66,7 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.DeletePost)]
         public void DeletePost([FromBody]Post post)
         {
-            using (var graphContext = new Neo4jDB("bolt://localhost:7687", "neo4j", "password"))
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
                 graphContext.DeletePost(post);
             }
