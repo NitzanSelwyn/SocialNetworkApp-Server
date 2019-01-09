@@ -5,6 +5,7 @@ using Common.Contracts.Databases;
 using Common.Enums;
 using Common.Models.TempModels;
 using Common.ResponseModels;
+using Newtonsoft.Json;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
@@ -21,19 +22,46 @@ namespace DAL
         {
             this.networkDb = networkDb;
         }
+        public Document GetUserDocById(string id)
+        {
+            //returns the user doc that matches this id
+            return networkDb.GetUsersTable().GetItem(id);
+        }
         public User GetUserById(string id)
         {
             //returns the user that matches this id,null if not exists
-            Document userDoc = networkDb.GetUsersTable().GetItem(id);
+            Document userDoc = GetUserDocById(id);
             if (userDoc != null)
             {
-                return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
+                return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"], userDoc["BlockedList"]);
             }
             else
             {
                 return null;
             }
         }
+
+        public ResponseEnum BlockUser(string userId, string onUserId)
+        {
+            //tries to block this user
+            try
+            {
+                User user = GetUserById(userId);
+                if (!user.Blocking.Contains(onUserId))
+                {
+                    user.Blocking.Add(onUserId);
+                    Document userDoc = GetUserDocById(userId);
+                    userDoc["BlockedList"] = JsonConvert.SerializeObject(user.Blocking);
+                }
+                return ResponseEnum.Succeeded;
+
+            }
+            catch
+            {
+                return ResponseEnum.Failed;
+            }
+        }
+
         public User RegisterUser(UserRegister userRegister)
         {
             //registers the users
@@ -57,5 +85,17 @@ namespace DAL
             }
         }
 
+        public List<UserRepresentation> GetBlockedUsers(string userId)
+        {
+            //returns the username and full name(represntation) of all the users that this user blocked
+            List<UserRepresentation> blockedUsers = new List<UserRepresentation>();
+            User thisUser = GetUserById(userId);
+            foreach (var Id in thisUser.Blocking)
+            {
+                User blockedUser = GetUserById(Id);
+                blockedUsers.Add(new UserRepresentation(blockedUser.ID, blockedUser.ToString()));
+            }
+            return blockedUsers;
+        }
     }
 }

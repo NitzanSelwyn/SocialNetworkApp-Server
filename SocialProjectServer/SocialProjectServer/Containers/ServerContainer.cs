@@ -1,6 +1,7 @@
 ﻿using BL.Managers;
 using Common.Contracts;
 using Common.Contracts.Databases;
+using Common.Contracts.Managers;
 using DAL;
 using DAL.Databases;
 using SimpleInjector;
@@ -33,6 +34,7 @@ namespace SocialProjectServer.Containers
 
                 //Managers
                 container.Register<IUsersManager, UsersManager>(Lifestyle.Singleton);
+                container.Register<ISettingsManager, SettingsManager>(Lifestyle.Singleton);
             }
 
         }

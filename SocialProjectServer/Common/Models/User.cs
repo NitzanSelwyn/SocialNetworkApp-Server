@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,9 +10,9 @@ namespace SocialProjectServer.Models
     {
         public User()
         {
-
+            Blocking = new List<string>();
         }
-        public User(string Username, string FirstName, string LastName, string Password, string Email, DateTime BirthDate, string Address, string WorkLocation)
+        public User(string Username, string FirstName, string LastName, string Password, string Email, DateTime BirthDate, string Address, string WorkLocation,string blockedList)
         {
             this.Username = Username;
             this.FirstName = FirstName;
@@ -21,6 +22,8 @@ namespace SocialProjectServer.Models
             this.BirthDate = BirthDate;
             this.Address = Address;
             this.WorkLocation = WorkLocation;
+            Blocking = new List<string>();
+            Blocking = JsonConvert.DeserializeObject<List<string>>(blockedList);
 
         }
         public string ID { get; set; }
@@ -34,5 +37,10 @@ namespace SocialProjectServer.Models
         public string WorkLocation { get; set; }
         public List<string> Following { get; set; }
         public List<string> Blocking { get; set; }
+
+        public override string ToString()
+        {
+            return $"{FirstName} {LastName}";
+        }
     }
 }
