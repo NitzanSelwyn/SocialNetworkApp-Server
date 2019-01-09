@@ -13,7 +13,7 @@ namespace Common.Models.TempModels
         public string onUserId { get; set; }// the id of the user that the requester made on (Example: userId wants to block onUserId)
         public string token { get; set; }
         public UserRequestEnum requestType { get; set; }
-        public UserRequestModel(string userId,string onUserId,string token,UserRequestEnum requestType)
+        public UserRequestModel(string userId, string onUserId, string token, UserRequestEnum requestType)
         {
             this.userId = userId;
             this.onUserId = onUserId;
@@ -24,6 +24,5 @@ namespace Common.Models.TempModels
         {
 
         }
-
     }
 }

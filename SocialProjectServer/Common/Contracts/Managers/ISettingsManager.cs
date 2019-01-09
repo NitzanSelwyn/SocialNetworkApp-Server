@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Common.Enums;
+using Common.Models.TempModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,6 @@ namespace Common.Contracts.Managers
 {
     public interface ISettingsManager
     {
+        ResponseEnum ManageRequest(UserRequestModel request);
     }
 }

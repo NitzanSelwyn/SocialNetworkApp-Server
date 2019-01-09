@@ -21,6 +21,9 @@ namespace DAL
         public NetworkRepository(INetworkDatabase networkDb)
         {
             this.networkDb = networkDb;
+            Document user = networkDb.GetUsersTable().GetItem("shahafd");
+            user["BlockedList"] = "ffd";
+            networkDb.GetUsersTable().PutItem(user);
         }
         public Document GetUserDocById(string id)
         {
@@ -76,6 +79,7 @@ namespace DAL
                 newUser["Email"] = userRegister.Email;
                 newUser["Address"] = userRegister.Address;
                 newUser["WorkLocation"] = userRegister.WorkLocation;
+                newUser["BlockedList"] = "";
                 networkDb.GetUsersTable().PutItem(newUser);
                 return GetUserById(userRegister.Username);
             }

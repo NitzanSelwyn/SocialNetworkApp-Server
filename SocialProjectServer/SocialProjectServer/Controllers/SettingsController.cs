@@ -1,5 +1,6 @@
 ﻿using Common.Configs;
 using Common.Contracts.Managers;
+using Common.Enums;
 using Common.Models.TempModels;
 using SocialProjectServer.Containers;
 using System;
@@ -24,6 +25,15 @@ namespace SocialProjectServer.Controllers
         public IHttpActionResult ManageRequest([FromBody]UserRequestModel requestModel)
         {
             //manages all the user to user request (block/unblock/friend/unfriend...)
+            ResponseEnum response = settingsManager.ManageRequest(requestModel);
+            if(response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace SocialProjectServer.Controllers
         public void AddNewPost([FromBody]Post post)
         {
 
-            var imageLink = UploadFileAsync(post.ImageLink, post.Author);
+            var imageLink = UploadFile(post.ImageLink, post.Author);
             post.ImageLink = imageLink;
 
             using (var graphContext = new Neo4jDB("bolt://localhost:7687", "hello", "123456"))
