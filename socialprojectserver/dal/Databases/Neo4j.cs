@@ -1,5 +1,6 @@
 ﻿using Common.Models;
 using Neo4j.Driver.V1;
+using Newtonsoft.Json;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
@@ -26,34 +27,35 @@ namespace DAL.Databases
 
         public void UploadPost(Post post)
         {
+            var statment = $"MATCH (u:User)" +
+                           $"WHERE u.Username = \"{post.Author}\"" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})" +
+                           $"CREATE (u)-[:Posted]->(p)" +
+                           $"RETURN *";
             using (var session = _driver.Session())
             {
-                var results = session.Run($"MATCH (u:User)" +
-                                          $"WHERE u.Username = \"{post.Author}\"" +
-                                          $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})" +
-                                          $"CREATE (u)-[:Posted]->(p)" +
-                                          $"RETURN *")
-                                          .Consume();
+                var results = session.Run(statment).Consume();
             }
         }
 
         public List<Post> GetUserPosts(User user)
         {
             List<Post> postList = new List<Post>();
+
+            var statment = $"MATCH (u:User)-[:Posted]->(p:Post)" +
+                           $"WHERE u.Username = \"{user.Username}\"" +
+                           $"RETURN p ORDER BY p.DatePosted DESC";
+
             using (var session = _driver.Session())
             {
-                var results = session.Run(
-                    $"MATCH (u:User)-[:Posted]->(p:Post)" +
-                    $"RETURN p ORDER BY p.DatePosted DESC");
+                var results = session.Run(statment);
 
-                    foreach (IRecord result in results)
-                    {
-                        var node = result["p"].As<INode>();
-                        var post = node.Properties["Author"]?.As<Post>();
-
-                        postList.Add(post);
-                    }
-                    return postList;               
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    postList.Add(JsonConvert.DeserializeObject<Post>(nodeProps));
+                }
+                return postList;
             }
         }
 
