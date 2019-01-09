@@ -1,10 +1,9 @@
 ﻿using Amazon.DynamoDBv2.DocumentModel;
 using Common.Configs;
 using Common.Contracts;
-using Common.Contracts.Databases;
 using Common.Enums;
 using Common.Models.TempModels;
-using Common.ResponseModels;
+using DAL.Databases;
 using Newtonsoft.Json;
 using SocialProjectServer.Models;
 using System;
@@ -13,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL
+namespace DAL.Repostiories
 {
     public class NetworkRepository : INetworkRepository
     {

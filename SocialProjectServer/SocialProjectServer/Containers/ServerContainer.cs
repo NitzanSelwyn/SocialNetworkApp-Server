@@ -1,9 +1,9 @@
 ﻿using BL.Managers;
 using Common.Contracts;
-using Common.Contracts.Databases;
 using Common.Contracts.Managers;
 using DAL;
 using DAL.Databases;
+using DAL.Repostiories;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using SocialProjectServer.Services;
