@@ -14,5 +14,7 @@ namespace Common.Contracts
     {
         User GetUserById(string id);
         User RegisterUser(UserRegister userRegister);
+        ResponseEnum BlockUser(string userId, string onUserId);
+        List<UserRepresentation> GetBlockedUsers(string userId);
     }
 }

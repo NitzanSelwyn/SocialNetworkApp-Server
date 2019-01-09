@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,19 +48,26 @@
     <Compile Include="Configs\DatabaseConfigs.cs" />
     <Compile Include="Configs\MainConfigs.cs" />
     <Compile Include="Configs\RouteConfigs.cs" />
+    <Compile Include="Contracts\Managers\ISettingsManager.cs" />
     <Compile Include="Contracts\Services\IAuthService.cs" />
     <Compile Include="Contracts\Services\IHttpClient.cs" />
     <Compile Include="Contracts\INetworkRepository.cs" />
     <Compile Include="Contracts\Managers\IUsersManager.cs" />
     <Compile Include="Enums\ResponseEnum.cs" />
+    <Compile Include="Enums\UserRequestEnum.cs" />
     <Compile Include="Infrastructure\Token.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\TempModels\UserLogin.cs" />
     <Compile Include="Models\TempModels\UserRegister.cs" />
+    <Compile Include="Models\TempModels\UserRepresentation.cs" />
+    <Compile Include="Models\TempModels\UserRequestModel.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseModels\LoginRegisterResponse.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
