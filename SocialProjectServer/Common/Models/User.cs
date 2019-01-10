@@ -12,7 +12,7 @@ namespace SocialProjectServer.Models
         {
             Blocking = new List<string>();
         }
-        public User(string Username, string FirstName, string LastName, string Password, string Email, DateTime BirthDate, string Address, string WorkLocation,string blockedList)
+        public User(string Username, string FirstName, string LastName, string Password, string Email, DateTime BirthDate, string Address, string WorkLocation)
         {
             this.Username = Username;
             this.FirstName = FirstName;
