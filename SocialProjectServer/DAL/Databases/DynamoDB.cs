@@ -21,8 +21,8 @@ namespace DAL.Databases
             clientConfig = new AmazonDynamoDBConfig();
             client = new AmazonDynamoDBClient(clientConfig);
             usersTable = Table.LoadTable(client, DatabaseConfigs.UsersTable);
-            postsTable = Table.LoadTable(client, DatabaseConfigs.PostsTable);
-            commentsTable = Table.LoadTable(client, DatabaseConfigs.CommentsTable);
+            //postsTable = Table.LoadTable(client, DatabaseConfigs.PostsTable);
+            //commentsTable = Table.LoadTable(client, DatabaseConfigs.CommentsTable);
         }
         public Table GetUsersTable()
         {

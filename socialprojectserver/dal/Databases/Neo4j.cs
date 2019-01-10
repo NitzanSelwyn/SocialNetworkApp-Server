@@ -35,15 +35,15 @@ namespace DAL.Databases
             using (var session = _driver.Session())
             {
                 var results = session.Run(statment).Consume();
-            }
+            }          
         }
 
-        public List<Post> GetUserPosts(User user)
+        public List<Post> GetUserPosts(string userName)
         {
             List<Post> postList = new List<Post>();
 
             var statment = $"MATCH (u:User)-[:Posted]->(p:Post)" +
-                           $"WHERE u.Username = \"{user.Username}\"" +
+                           $"WHERE u.Username = \"{userName}\"" +
                            $"RETURN p ORDER BY p.DatePosted DESC";
 
             using (var session = _driver.Session())
@@ -59,44 +59,36 @@ namespace DAL.Databases
             }
         }
 
-        public List<Post> GetFolowersPosts(User user)
+        public List<Post> GetFollowingsPosts(string userName)
         {
             List<Post> postList = new List<Post>();
 
+            var statment = $"MATCH (u:User)-[:Follow]->(u2:User)" +
+                           $"WHERE u.Username = \"{userName}\"" +
+                           $"MATCH (u2)-[:Post]->(p:Post)" +
+                           $"RETURN p";
+
             using (var session = _driver.Session())
             {
-                using (var tx = session.BeginTransaction())
-                {
-                    IStatementResult results = tx.Run(
-                        @"MATCH (u:Users)--[:Follow]->(f:Users)
-                          WHERE u.UserName == $user.UserName
-                          MATCH f --[:Posted]->(p:Posts)
-                          RETURN p");
-                    foreach (IRecord result in results)
-                    {
-                        var node = result["p"].As<INode>();
-                        var post = node.Properties["PostID"]?.As<Post>();
+                var results = session.Run(statment);
 
-                        postList.Add(post);
-                    }
-                    return postList;
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    postList.Add(JsonConvert.DeserializeObject<Post>(nodeProps));
                 }
+                return postList;
             }
         }
 
         public void DeletePost(Post post)
         {
+            var statment = $"MATCH (p:Post {{Author: \"{post.Author}\"}}) DETACH DELETE p";
+
             using (var session = _driver.Session())
             {
-                var greeting = session.ReadTransaction(tx =>
-                {
-                    var result = tx.Run("CREATE  " +
-                                        "SET  ",
-                        new { post });
-                    return result.Single()[0].As<Post>();
-                });
+                var results = session.Run(statment);
             }
-
         }
     }
 }

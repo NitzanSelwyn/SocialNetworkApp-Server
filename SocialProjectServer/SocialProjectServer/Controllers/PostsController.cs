@@ -44,21 +44,21 @@ namespace SocialProjectServer.Controllers
 
         [HttpGet]
         [Route(RouteConfigs.GetUsersPosts)]
-        public List<Post> GetUserPosts([FromBody]User user)
+        public List<Post> GetUserPosts([FromBody]string userName)
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                return graphContext.GetUserPosts(user);
+                return graphContext.GetUserPosts(userName);
             }
         }
 
         [HttpGet]
         [Route(RouteConfigs.GetFolowersPosts)]
-        public List<Post> GetFolowersPosts([FromBody]User user)
+        public List<Post> GetFolowersPosts([FromBody]string userName)
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                return graphContext.GetFolowersPosts(user);
+                return graphContext.GetFollowingsPosts(userName);
             }
         }
 
