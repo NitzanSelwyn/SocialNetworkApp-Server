@@ -1,7 +1,9 @@
-﻿using Common.Contracts;
+﻿using Amazon.DynamoDBv2.DocumentModel;
+using Common.Contracts;
 using Common.Contracts.Managers;
 using Common.Enums;
 using Common.Models.TempModels;
+using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,7 @@ namespace BL.Managers
         {
             this.repository = repository;
         }
+        
         public ResponseEnum ManageRequest(UserRequestModel request)
         {
             //manages all the user to user requests (block/unblock/friend/unfriend...)

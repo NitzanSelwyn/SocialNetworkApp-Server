@@ -28,6 +28,7 @@ namespace Common.Configs
         public const string UserLoginRoute = "Api/Users/UserLogin";
         public const string UserRegisterRoute = "Api/Users/UserRegister";
         public const string UsernameExistsRoute = "Api/Users/UsernameExists";
+        public const string EditUserDetailsRoute = "Api/Users/EditUserDetails";
 
         //SETTINGS
         public const string ManageRequestRoute = "Api/Settings/ManageRequest";
