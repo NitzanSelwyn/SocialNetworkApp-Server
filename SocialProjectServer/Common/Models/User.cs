@@ -12,7 +12,7 @@ namespace SocialProjectServer.Models
         {
             Blocking = new List<string>();
         }
-        public User(string Username, string FirstName, string LastName, string Password, string Email, DateTime BirthDate, string Address, string WorkLocation,string blockedList)
+        public User(string Username, string FirstName, string LastName, string Password, string Email, DateTime BirthDate, string Address, string WorkLocation)
         {
             this.Username = Username;
             this.FirstName = FirstName;
@@ -22,9 +22,6 @@ namespace SocialProjectServer.Models
             this.BirthDate = BirthDate;
             this.Address = Address;
             this.WorkLocation = WorkLocation;
-            Blocking = new List<string>();
-            Blocking = JsonConvert.DeserializeObject<List<string>>(blockedList);
-
         }
         public string ID { get; set; }
         public string Username { get; set; }

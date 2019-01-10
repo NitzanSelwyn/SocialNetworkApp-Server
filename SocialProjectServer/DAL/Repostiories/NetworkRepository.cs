@@ -20,9 +20,7 @@ namespace DAL.Repostiories
         public NetworkRepository(INetworkDatabase networkDb)
         {
             this.networkDb = networkDb;
-            Document user = networkDb.GetUsersTable().GetItem("shahafd");
-            user["BlockedList"] = "ffd";
-            networkDb.GetUsersTable().PutItem(user);
+
         }
         public Document GetUserDocById(string id)
         {
@@ -35,7 +33,7 @@ namespace DAL.Repostiories
             Document userDoc = GetUserDocById(id);
             if (userDoc != null)
             {
-                return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"], userDoc["BlockedList"]);
+                return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
             }
             else
             {
@@ -46,22 +44,8 @@ namespace DAL.Repostiories
         public ResponseEnum BlockUser(string userId, string onUserId)
         {
             //tries to block this user
-            try
-            {
-                User user = GetUserById(userId);
-                if (!user.Blocking.Contains(onUserId))
-                {
-                    user.Blocking.Add(onUserId);
-                    Document userDoc = GetUserDocById(userId);
-                    userDoc["BlockedList"] = JsonConvert.SerializeObject(user.Blocking);
-                }
-                return ResponseEnum.Succeeded;
-
-            }
-            catch
-            {
-                return ResponseEnum.Failed;
-            }
+            //Neo4j implementation
+            return ResponseEnum.Failed;
         }
 
         public User RegisterUser(UserRegister userRegister)
@@ -78,7 +62,6 @@ namespace DAL.Repostiories
                 newUser["Email"] = userRegister.Email;
                 newUser["Address"] = userRegister.Address;
                 newUser["WorkLocation"] = userRegister.WorkLocation;
-                newUser["BlockedList"] = "";
                 networkDb.GetUsersTable().PutItem(newUser);
                 return GetUserById(userRegister.Username);
             }
@@ -92,12 +75,7 @@ namespace DAL.Repostiories
         {
             //returns the username and full name(represntation) of all the users that this user blocked
             List<UserRepresentation> blockedUsers = new List<UserRepresentation>();
-            User thisUser = GetUserById(userId);
-            foreach (var Id in thisUser.Blocking)
-            {
-                User blockedUser = GetUserById(Id);
-                blockedUsers.Add(new UserRepresentation(blockedUser.ID, blockedUser.ToString()));
-            }
+           //neo4j implementation
             return blockedUsers;
         }
     }
