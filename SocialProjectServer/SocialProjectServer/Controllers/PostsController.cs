@@ -23,7 +23,7 @@ namespace SocialProjectServer.Controllers
         static AmazonS3Client s3Client = new AmazonS3Client();
 
         private const string bucketName = "socialprojectimages";
-        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest1;
         private const string baseURL = "https://s3-eu-west-1.amazonaws.com/socialprojectimages/";
         private const string neo4jDBConnectionString = "bolt://ec2-34-245-150-157.eu-west-1.compute.amazonaws.com:7687";
         private const string neo4jDBUserName = "neo4j";
@@ -32,9 +32,12 @@ namespace SocialProjectServer.Controllers
         [HttpPost]
         [Route(RouteConfigs.PostNewMessage)]
         public void AddNewPost([FromBody]Post post)
-        { 
-            //var imageLink = UploadFileAsync(post.ImageLink, post.Author);
-            //post.ImageLink = imageLink;
+        {
+            if (post.Image != null)
+            {
+                var imageLink = UploadFile(post.Image, post.Author);
+                post.ImageLink = imageLink;
+            }
 
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
@@ -72,32 +75,55 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        private static  string UploadFile(string filePath, string authorName)
+        [HttpPost]
+        [Route(RouteConfigs.Like)]
+        public void LikePost([FromBody]Like like)
         {
-            var fileName = $"{authorName}/{DateTime.Now.ToString()}";
-            s3Client = new AmazonS3Client(bucketRegion);
-
-            s3Client.PutACL(new PutACLRequest
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                BucketName = "socialprojectimages",
-                Key = "name",
-                CannedACL = S3CannedACL.PublicRead,
-            });
+                graphContext.LikePost(postId);
+            }
+        }
+
+        [HttpPost]
+        [Route(RouteConfigs.CommentOnPost)]
+        public void CommentOnPost([FromBody]Comment comment)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+                graphContext.CommentOnPost(comment);
+            }
+        }
+
+        private static string UploadFile(byte[] file, string authorName)
+        {
+            var image = new MemoryStream(file);
+
+            var fileName = $"{authorName}/{DateTime.Now.ToString()}.png";
+
+            var fileTransferUtility =
+                   new TransferUtility(s3Client);
 
             try
             {
+                fileTransferUtility.Upload(stream: image, bucketName: bucketName, key: fileName);
 
-                PutObjectRequest putRequest = new PutObjectRequest
+                fileTransferUtility.S3Client.PutACL(new PutACLRequest
+                {
+                    CannedACL = S3CannedACL.PublicReadWrite,
+                    BucketName = bucketName,
+                    Key = fileName
+                });
+
+                var URL = s3Client.GetPreSignedURL(new GetPreSignedUrlRequest
                 {
                     BucketName = bucketName,
                     Key = fileName,
-                    FilePath = filePath,
-                    ContentType = "image/png"
+                    Expires = DateTime.MaxValue
+                });
 
-                };
-
-                 s3Client.PutObject(putRequest);
-                return baseURL + fileName;
+                var finalURL = URL.Split('?');
+                return finalURL[0];
             }
 
             catch (AmazonS3Exception e)
@@ -109,8 +135,8 @@ namespace SocialProjectServer.Controllers
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
             }
             return null;
-
         }
+
     }
 }
 
