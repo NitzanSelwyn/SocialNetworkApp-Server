@@ -162,7 +162,8 @@ namespace DAL.Repostiories
             return userRepresentations;
         }
 
-        public ResponseEnum ChangePassword(EditPassword editPassword)
+       
+        public ResponseEnum EditPassword(EditPassword editPassword)
         {
             try
             {
@@ -171,7 +172,7 @@ namespace DAL.Repostiories
                 networkDb.GetUsersTable().PutItem(userDoc);
                 return ResponseEnum.Succeeded;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return ResponseEnum.Failed;
             }

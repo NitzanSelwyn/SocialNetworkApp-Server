@@ -8,6 +8,10 @@ namespace Common.Configs
 {
     public static class DatabaseConfigs
     {
+        public const string neo4jDBConnectionString = "bolt://ec2-34-245-150-157.eu-west-1.compute.amazonaws.com:7687";
+        public const string neo4jDBUserName = "neo4j";
+        public const string neo4jDBPassword = "123456";
+
         public const string UsersTable = "Users";
         public const string UsersKey = "Username";
 

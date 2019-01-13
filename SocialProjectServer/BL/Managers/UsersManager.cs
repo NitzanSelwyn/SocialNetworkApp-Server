@@ -1,8 +1,10 @@
 ﻿using Amazon.DynamoDBv2.DocumentModel;
+using Common.Configs;
 using Common.Contracts;
 using Common.Enums;
 using Common.Models.TempModels;
 using Common.ResponseModels;
+using DAL.Databases;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
@@ -63,7 +65,12 @@ namespace BL.Managers
             }
             else
             {
-                return TryRegister(new UserRegister(user.Username, user.Firstname, user.Lastname));
+                UserRegister userRegister = new UserRegister(user.Username, user.Firstname, user.Lastname);
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    graphContext.RegisterUserToNeo4j(userRegister.Username);
+                }
+                return TryRegister(userRegister);
             }
         }
     }

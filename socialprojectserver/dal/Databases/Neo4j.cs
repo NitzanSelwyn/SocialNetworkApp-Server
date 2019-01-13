@@ -201,7 +201,7 @@ namespace DAL.Databases
         public ResponseEnum UnFollowUser(string userName, string unFollowUserName)
         {
             var statment = $"MATCH (u:User)-[f:Follow]->(bu:User)" +
-                           $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
+                           $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unFollowUserName}\"" +
                            $"DELETE f";
 
             try
