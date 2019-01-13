@@ -35,6 +35,21 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+        [HttpPost]
+        [Route(RouteConfigs.EditUserPasswordRoute)]
+        public IHttpActionResult ChangePassword([FromBody]EditPassword editPassword)
+        {
+            //edits a user password
+            ResponseEnum response = settingsManager.ChangePassword(editPassword);
+            if (response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
 
+        }
     }
 }

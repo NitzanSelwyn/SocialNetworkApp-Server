@@ -12,7 +12,18 @@ namespace Common.Models.TempModels
         {
 
         }
-
+        //facebook registration
+        public UserRegister(string Username,string FirstName,string LastName)
+        {
+            this.Username = Username;
+            this.FirstName = FirstName;
+            this.LastName = LastName;
+            Address = "_";
+            Email = "_";
+            WorkLocation = "_";
+            Password = "_";
+            BirthDate = DateTime.Now;
+        }
         public string Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

@@ -48,5 +48,10 @@ namespace BL.Managers
         {
             return repository.GetFollowingUsers(userId);
         }
+
+        public ResponseEnum ChangePassword(EditPassword editPassword)
+        {
+            return repository.EditPassword(editPassword);
+        }
     }
 }

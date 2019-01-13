@@ -17,5 +17,6 @@ namespace Common.Contracts
         User TryRegister(UserRegister userRegister);
         User GetUserById(string id);
         User EditUserDetails(User user);
+        User FacebookLogin(FacebookUser user);
     }
 }

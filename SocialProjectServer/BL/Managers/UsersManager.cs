@@ -1,8 +1,10 @@
 ﻿using Amazon.DynamoDBv2.DocumentModel;
+using Common.Configs;
 using Common.Contracts;
 using Common.Enums;
 using Common.Models.TempModels;
 using Common.ResponseModels;
+using DAL.Databases;
 using SocialProjectServer.Models;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace BL.Managers
 {
-    public class UsersManager:IUsersManager
+    public class UsersManager : IUsersManager
     {
         public INetworkRepository repository { get; set; }
         public UsersManager(INetworkRepository repository)
@@ -52,6 +54,24 @@ namespace BL.Managers
         {
             //tries a user registration
             return repository.RegisterUser(userRegister);
+        }
+
+        public User FacebookLogin(FacebookUser user)
+        {
+            //checks if the user exists, if not adds him to the database 
+            if (IsUsernameExists(user.Username))
+            {
+                return GetUserById(user.Username);
+            }
+            else
+            {
+                UserRegister userRegister = new UserRegister(user.Username, user.Firstname, user.Lastname);
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    graphContext.RegisterUserToNeo4j(userRegister.Username);
+                }
+                return TryRegister(userRegister);
+            }
         }
     }
 }

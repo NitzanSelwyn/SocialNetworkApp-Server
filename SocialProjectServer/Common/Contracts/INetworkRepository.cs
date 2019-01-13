@@ -24,5 +24,6 @@ namespace Common.Contracts
         List<UserRepresentation> GetFollowingUsers(string userId);
         Document GetUserDocById(string id);
         User EditUserDetails(User user);
+        ResponseEnum EditPassword(EditPassword editPassword);
     }
 }
