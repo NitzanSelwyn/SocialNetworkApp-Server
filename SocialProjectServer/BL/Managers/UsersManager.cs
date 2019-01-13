@@ -1,4 +1,5 @@
-﻿using Common.Contracts;
+﻿using Amazon.DynamoDBv2.DocumentModel;
+using Common.Contracts;
 using Common.Enums;
 using Common.Models.TempModels;
 using Common.ResponseModels;
@@ -37,7 +38,11 @@ namespace BL.Managers
             }
             return user;
         }
-
+        public User EditUserDetails(User user)
+        {
+            //tries to edit the user details
+            return repository.EditUserDetails(user);
+        }
         public bool IsUsernameExists(string userName)
         {
             //checks if the username exists

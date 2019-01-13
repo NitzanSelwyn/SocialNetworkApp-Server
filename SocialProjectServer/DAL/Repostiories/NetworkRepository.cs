@@ -102,7 +102,26 @@ namespace DAL.Repostiories
                 return null;
             }
         }
-
+        public User EditUserDetails(User user)
+        {
+            //registers the users
+            try
+            {
+                Document existingUser = GetUserDocById(user.ID);
+                existingUser["FirstName"] = user.FirstName;
+                existingUser["LastName"] = user.LastName;
+                existingUser["BirthDate"] = user.BirthDate;
+                existingUser["Email"] = user.Email;
+                existingUser["Address"] = user.Address;
+                existingUser["WorkLocation"] = user.WorkLocation;
+                networkDb.GetUsersTable().PutItem(existingUser);
+                return GetUserById(user.Username);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
         public List<UserRepresentation> GetBlockedUsers(string userId)
         {
             List<string> userNames = new List<string>();

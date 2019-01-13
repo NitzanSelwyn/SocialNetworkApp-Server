@@ -16,5 +16,6 @@ namespace Common.Contracts
         bool IsUsernameExists(string userName);
         User TryRegister(UserRegister userRegister);
         User GetUserById(string id);
+        User EditUserDetails(User user);
     }
 }

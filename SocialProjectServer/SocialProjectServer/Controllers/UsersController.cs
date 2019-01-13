@@ -47,6 +47,21 @@ namespace SocialProjectServer.Controllers
             }
         }
         [HttpPost]
+        [Route(RouteConfigs.EditUserDetailsRoute)]
+        public IHttpActionResult EditUserDetails([FromBody]User userToEdit)
+        {
+            //edits the user details
+            User user = usersManager.EditUserDetails(userToEdit);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
+        [HttpPost]
         [Route(RouteConfigs.UserRegisterRoute)]
         public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
         {
