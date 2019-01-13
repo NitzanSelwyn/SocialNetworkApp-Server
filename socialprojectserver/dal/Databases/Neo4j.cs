@@ -67,7 +67,7 @@ namespace DAL.Databases
 
             var statment = $"MATCH (u:User)-[:Follow]->(u2:User)" +
                            $"WHERE u.Username = \"{userName}\"" +
-                           $"MATCH (u2)-[:Post]->(p:Post)" +
+                           $"MATCH (u2)-[:Posted]->(p:Post)" +
                            $"RETURN p";
 
             using (var session = _driver.Session())
@@ -85,7 +85,9 @@ namespace DAL.Databases
 
         public void DeletePost(Post post)
         {
-            var statment = $"MATCH (p:Post {{Author: \"{post.Author}\"}}) DETACH DELETE p";
+            var statment = $"MATCH (p:Post)" +
+                           $"WHERE p.PostId = {post.PostId}" +
+                           $"DETACH DELETE p";
 
             using (var session = _driver.Session())
             {
@@ -201,7 +203,7 @@ namespace DAL.Databases
         public ResponseEnum UnFollowUser(string userName, string unFollowUserName)
         {
             var statment = $"MATCH (u:User)-[f:Follow]->(bu:User)" +
-                           $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
+                           $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unFollowUserName}\"" +
                            $"DELETE f";
 
             try
@@ -259,6 +261,27 @@ namespace DAL.Databases
                     usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
                 }
                 return usertList;
+            }
+        }
+
+        public List<Comment> GetCommentsOfPost(string postId)
+        {
+            var commentList = new List<Comment>();
+
+            var statment = $"MATCH (c:Comment)-[:CommentedOn]->(p:Post)" +
+                           $"WHERE p.PostId = {postId}" +
+                           $"RETURN c";
+
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    commentList.Add(JsonConvert.DeserializeObject<Comment>(nodeProps));
+                }
+                return commentList;
             }
         }
     }

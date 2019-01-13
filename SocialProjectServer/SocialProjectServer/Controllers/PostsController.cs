@@ -55,7 +55,7 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(RouteConfigs.GetFolowersPosts)]
         public List<Post> GetFolowersPosts([FromBody]string userName)
         {
@@ -81,7 +81,7 @@ namespace SocialProjectServer.Controllers
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                graphContext.LikePost(postId);
+                graphContext.LikePost(like);
             }
         }
 
