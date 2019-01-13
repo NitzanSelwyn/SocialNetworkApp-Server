@@ -89,13 +89,42 @@ namespace DAL.Databases
 
             using (var session = _driver.Session())
             {
-                var results = session.Run(statment);
+                var results = session.Run(statment).Consume();
             }
         }
 
         public void RegisterUserToNeo4j(string userName)
         {
             var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment).Consume();
+            }
+        }
+
+        public void LikePost(Like like)
+        {
+            var statment = $"MATCH (p:Post)" +
+                           $"WHERE p.postId = \"{like.postId}\"" +
+                           $"CREATE (u:User)-[:Like]->(p)" +
+                           $"WHERE u.Username = \"{like.UserName}\"" +
+                           $"RETURN *";
+
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment).Consume();
+            }
+        }
+
+        public void CommentOnPost(Comment comment)
+        {
+            var statment = $"MATCH (p:Post)" +
+                           $"WHERE p.postId = \"{comment.postId}\"" +
+                           $"CREATE (c:Comment {{Content: \"{comment.Content}\", Author: \"{comment.Author}\"}})-[:CommentedOn]->(p)" +
+                           $"WHERE u.Username = \"{comment.Author}\"" +
+                           $"CREATE (u)-[:Comment]->(c)" +
+                           $"RETURN *";
+
             using (var session = _driver.Session())
             {
                 var results = session.Run(statment).Consume();
@@ -194,9 +223,9 @@ namespace DAL.Databases
         {
             List<string> usertList = new List<string>();
 
-            var statment = $"MATCH (u:User)-[:Block]->(:User)" +
+            var statment = $"MATCH (u:User)-[:Block]->(bu:User)" +
                            $"WHERE u.Username = \"{userName}\"" +
-                           $"RETURN *";
+                           $"RETURN bu";
 
             using (var session = _driver.Session())
             {
@@ -216,9 +245,9 @@ namespace DAL.Databases
         {
             List<string> usertList = new List<string>();
 
-            var statment = $"MATCH (u:User)-[:Follow]->(:User)" +
+            var statment = $"MATCH (u:User)-[:Follow]->(fu:User)" +
                            $"WHERE u.Username = \"{userName}\"" +
-                           $"RETURN *";
+                           $"RETURN fu";
 
             using (var session = _driver.Session())
             {

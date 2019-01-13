@@ -102,6 +102,7 @@ namespace DAL.Repostiories
                 return null;
             }
         }
+
         public User EditUserDetails(User user)
         {
             //registers the users
@@ -122,6 +123,7 @@ namespace DAL.Repostiories
                 return null;
             }
         }
+
         public List<UserRepresentation> GetBlockedUsers(string userId)
         {
             List<string> userNames = new List<string>();

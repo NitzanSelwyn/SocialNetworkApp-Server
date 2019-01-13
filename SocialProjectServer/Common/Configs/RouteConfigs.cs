@@ -22,6 +22,8 @@ namespace Common.Configs
         public const string GetFolowersPosts = "Api/Post/FolowersPosts";
         public const string EditPost = "Api/Post/edit";
         public const string DeletePost = "Api/Post";
+        public const string Like = "Api/Like";
+        public const string CommentOnPost = "Api/Comment";
 
         //USERS
         public const string GetMyUserRoute = "Api/users/GetUserByToken";

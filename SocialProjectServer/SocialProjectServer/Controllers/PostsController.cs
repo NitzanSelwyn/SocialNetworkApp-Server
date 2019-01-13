@@ -75,6 +75,26 @@ namespace SocialProjectServer.Controllers
             }
         }
 
+        [HttpPost]
+        [Route(RouteConfigs.Like)]
+        public void LikePost([FromBody]Like like)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+                graphContext.LikePost(postId);
+            }
+        }
+
+        [HttpPost]
+        [Route(RouteConfigs.CommentOnPost)]
+        public void CommentOnPost([FromBody]Comment comment)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+                graphContext.CommentOnPost(comment);
+            }
+        }
+
         private static string UploadFile(byte[] file, string authorName)
         {
             var image = new MemoryStream(file);
