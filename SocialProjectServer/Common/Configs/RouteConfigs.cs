@@ -30,8 +30,11 @@ namespace Common.Configs
         public const string UsernameExistsRoute = "Api/Users/UsernameExists";
         public const string EditUserDetailsRoute = "Api/Users/EditUserDetails";
 
+        public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
+
         //SETTINGS
         public const string ManageRequestRoute = "Api/Settings/ManageRequest";
         public const string GetBlockedUsers = "Api/Settings/GetBlockedUsers";
+        public const string EditUserPasswordRoute = "Api/Settings/ChangePassword";
     }
 }

@@ -46,5 +46,11 @@ namespace BL.Managers
             //returns all the users that this user blocked
             return repository.GetBlockedUsers(userId);
         }
+
+        public ResponseEnum ChangePassword(EditPassword editPassword)
+        {
+            //changes the password
+            return repository.ChangePassword(editPassword);
+        }
     }
 }

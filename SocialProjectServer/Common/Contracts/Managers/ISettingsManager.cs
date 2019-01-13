@@ -11,5 +11,6 @@ namespace Common.Contracts.Managers
     public interface ISettingsManager
     {
         ResponseEnum ManageRequest(UserRequestModel request);
+        ResponseEnum ChangePassword(EditPassword editPassword);
     }
 }

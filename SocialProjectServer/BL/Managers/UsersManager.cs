@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BL.Managers
 {
-    public class UsersManager:IUsersManager
+    public class UsersManager : IUsersManager
     {
         public INetworkRepository repository { get; set; }
         public UsersManager(INetworkRepository repository)
@@ -52,6 +52,19 @@ namespace BL.Managers
         {
             //tries a user registration
             return repository.RegisterUser(userRegister);
+        }
+
+        public User FacebookLogin(FacebookUser user)
+        {
+            //checks if the user exists, if not adds him to the database 
+            if (IsUsernameExists(user.Username))
+            {
+                return GetUserById(user.Username);
+            }
+            else
+            {
+                return TryRegister(new UserRegister(user.Username, user.Firstname, user.Lastname));
+            }
         }
     }
 }

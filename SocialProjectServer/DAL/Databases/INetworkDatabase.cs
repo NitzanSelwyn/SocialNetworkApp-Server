@@ -9,8 +9,6 @@ namespace DAL.Databases
 {
     public interface INetworkDatabase
     {
-        Table GetPostsTable();
-        Table GetCommentTable();
         Table GetUsersTable();
     }
 }

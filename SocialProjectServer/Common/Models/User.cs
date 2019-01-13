@@ -22,11 +22,10 @@ namespace SocialProjectServer.Models
             this.BirthDate = BirthDate;
             this.Address = Address;
             this.WorkLocation = WorkLocation;
-            //Blocking = new List<string>();
-            //Blocking = JsonConvert.DeserializeObject<List<string>>(blockedList);
+           
 
         }
-        public string ID { get; set; }
+       // public string ID { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

@@ -75,7 +75,7 @@ namespace DAL.Repostiories
             //registers the users
             try
             {
-                Document existingUser = GetUserDocById(user.ID);
+                Document existingUser = GetUserDocById(user.Username);
                 existingUser["FirstName"] = user.FirstName;
                 existingUser["LastName"] = user.LastName;
                 existingUser["BirthDate"] = user.BirthDate;
@@ -96,6 +96,21 @@ namespace DAL.Repostiories
             List<UserRepresentation> blockedUsers = new List<UserRepresentation>();
             //neo4j implementation
             return blockedUsers;
+        }
+
+        public ResponseEnum ChangePassword(EditPassword editPassword)
+        {
+            try
+            {
+                Document userDoc = GetUserDocById(editPassword.Username);
+                userDoc["Password"] = editPassword.NewPassword;
+                networkDb.GetUsersTable().PutItem(userDoc);
+                return ResponseEnum.Succeeded;
+            }
+            catch(Exception e)
+            {
+                return ResponseEnum.Failed;
+            }
         }
     }
 }

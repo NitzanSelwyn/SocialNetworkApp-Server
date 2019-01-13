@@ -1,5 +1,6 @@
 ﻿using Common.Configs;
 using Common.Contracts;
+using Common.Enums;
 using Common.Models.TempModels;
 using Common.ResponseModels;
 using SocialProjectServer.Containers;
@@ -40,6 +41,23 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
+        [HttpPost]
+        [Route(RouteConfigs.FacebookLoginRoute)]
+        public IHttpActionResult FacebookLogin([FromBody]FacebookUser user)
+        {
+            //a user logged in with facebook
+            User loggedIn = usersManager.FacebookLogin(user);
+            if (loggedIn != null)
+            {
+                return Ok(new LoginRegisterResponse(GetToken(loggedIn.Username), loggedIn));
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
+
         [HttpPost]
         [Route(RouteConfigs.EditUserDetailsRoute)]
         public IHttpActionResult EditUserDetails([FromBody]User userToEdit)
