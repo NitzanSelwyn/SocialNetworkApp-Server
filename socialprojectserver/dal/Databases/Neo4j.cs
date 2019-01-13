@@ -1,4 +1,6 @@
-﻿using Common.Models;
+﻿using Common.Enums;
+using Common.Models;
+using Common.Models.TempModels;
 using Neo4j.Driver.V1;
 using Newtonsoft.Json;
 using SocialProjectServer.Models;
@@ -29,13 +31,13 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", Likes: \"{post.Like}\"}})" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
             using (var session = _driver.Session())
             {
                 var results = session.Run(statment).Consume();
-            }          
+            }
         }
 
         public List<Post> GetUserPosts(string userName)
@@ -88,6 +90,146 @@ namespace DAL.Databases
             using (var session = _driver.Session())
             {
                 var results = session.Run(statment);
+            }
+        }
+
+        public void RegisterUserToNeo4j(string userName)
+        {
+            var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment).Consume();
+            }
+        }
+
+        public ResponseEnum BlockUser(string userName, string blockedUserName)
+        {
+            var statment = $"MATCH (u:User)" +
+                           $"WHERE u.Username = \"{userName}\"" +
+                           $"CREATE (u)-[:Block]->(bu:User)" +
+                           $"WHERE bu.Username = \"{blockedUserName}\"" +
+                           $"RETURN *";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+               return ResponseEnum.Failed;
+            }
+        }
+
+        public ResponseEnum UnBlockUser(string userName, string unBlockedUserName)
+        {
+            var statment = $"MATCH (u:User)-[b:Block]->(bu:User)" +
+                           $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
+                           $"DELETE b";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        public ResponseEnum FollowUser(string userName, string blockedUserName)
+        {
+            var statment = $"MATCH (u:User)" +
+               $"WHERE u.Username = \"{userName}\"" +
+               $"CREATE (u)-[:Follow]->(bu:User)" +
+               $"WHERE bu.Username = \"{blockedUserName}\"" +
+               $"RETURN *";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        public ResponseEnum UnFollowUser(string userName, string unFollowUserName)
+        {
+            var statment = $"MATCH (u:User)-[f:Follow]->(bu:User)" +
+                           $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
+                           $"DELETE f";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        public List<string> GetBlockedUsers(string userName)
+        {
+            List<string> usertList = new List<string>();
+
+            var statment = $"MATCH (u:User)-[:Block]->(:User)" +
+                           $"WHERE u.Username = \"{userName}\"" +
+                           $"RETURN *";
+
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
+                }
+                return usertList;
+            }
+
+        }
+
+        public List<string> GetFollowingUsers(string userName)
+        {
+            List<string> usertList = new List<string>();
+
+            var statment = $"MATCH (u:User)-[:Follow]->(:User)" +
+                           $"WHERE u.Username = \"{userName}\"" +
+                           $"RETURN *";
+
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
+                }
+                return usertList;
             }
         }
     }

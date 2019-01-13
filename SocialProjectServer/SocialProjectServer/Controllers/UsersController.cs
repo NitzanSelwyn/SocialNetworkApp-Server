@@ -2,6 +2,7 @@
 using Common.Contracts;
 using Common.Models.TempModels;
 using Common.ResponseModels;
+using DAL.Databases;
 using SocialProjectServer.Containers;
 using SocialProjectServer.Models;
 using SocialProjectServer.Services;
@@ -18,6 +19,11 @@ namespace SocialProjectServer.Controllers
     {
         IUsersManager usersManager { get; set; }
         IHttpClient httpClient { get; set; }
+
+        private const string neo4jDBConnectionString = "bolt://ec2-34-245-150-157.eu-west-1.compute.amazonaws.com:7687";
+        private const string neo4jDBUserName = "neo4j";
+        private const string neo4jDBPassword = "123456";
+
         public UsersController()
         {
             usersManager = ServerContainer.container.GetInstance<IUsersManager>();
@@ -50,6 +56,10 @@ namespace SocialProjectServer.Controllers
             if (user != null)
             {
                 token = GetToken(user.Username);
+                using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+                {
+                    graphContext.RegisterUserToNeo4j(userRegister.Username);
+                }
             }
             return Ok(new LoginRegisterResponse(token, user));
         }

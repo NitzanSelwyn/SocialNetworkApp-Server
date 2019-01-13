@@ -15,6 +15,11 @@ namespace Common.Contracts
         User GetUserById(string id);
         User RegisterUser(UserRegister userRegister);
         ResponseEnum BlockUser(string userId, string onUserId);
+        ResponseEnum UnBlockUser(string userId, string onUserId);
+        ResponseEnum FollowUser(string userId, string onUserId);
+        ResponseEnum UnFollowUser(string userId, string onUserId);
+
         List<UserRepresentation> GetBlockedUsers(string userId);
+        List<UserRepresentation> GetFollowingUsers(string userId);
     }
 }

@@ -24,24 +24,26 @@ namespace BL.Managers
             {
                 case UserRequestEnum.Block:
                     return repository.BlockUser(request.userId, request.onUserId);
-                //  case UserRequestEnum.UnBlock:
-                //      break;
-                //  case UserRequestEnum.Follow:
-                //      break;
-                //  case UserRequestEnum.UnFollow:
-                //      break;
-                //  case UserRequestEnum.AddToFriends:
-                //      break;
-                //  case UserRequestEnum.RemoveFromFriends:
-                //      break;
+                case UserRequestEnum.UnBlock:
+                    return repository.UnBlockUser(request.userId, request.onUserId);
+                case UserRequestEnum.Follow:
+                    return repository.FollowUser(request.userId, request.onUserId);
+                case UserRequestEnum.UnFollow:
+                    return repository.UnFollowUser(request.userId, request.onUserId);
                 default:
                     return ResponseEnum.Succeeded;
             }
         }
+
         public List<UserRepresentation> GetBlockedUsers(string userId)
         {
             //returns all the users that this user blocked
             return repository.GetBlockedUsers(userId);
+        }
+
+        public List<UserRepresentation> GetFollowingUsers(string userId)
+        {
+            return repository.GetFollowingUsers(userId);
         }
     }
 }

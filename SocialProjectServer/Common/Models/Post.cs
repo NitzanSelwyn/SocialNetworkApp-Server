@@ -13,10 +13,8 @@ namespace Common.Models
 
         public string Content { get; set; }
 
-        //public List<Comment> Comments { get; set; }
+        public byte[] Image { get; set; }
 
         public string ImageLink { get; set; }
-
-        public int Like { get; set; }
     }
 }
