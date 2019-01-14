@@ -18,14 +18,10 @@ namespace DAL.Repostiories
     {
         public INetworkDatabase networkDb { get; set; }
 
-        private const string neo4jDBConnectionString = "bolt://ec2-34-245-150-157.eu-west-1.compute.amazonaws.com:7687";
-        private const string neo4jDBUserName = "neo4j";
-        private const string neo4jDBPassword = "123456";
 
         public NetworkRepository(INetworkDatabase networkDb)
         {
             this.networkDb = networkDb;
-
         }
 
         public Document GetUserDocById(string id)
@@ -33,14 +29,18 @@ namespace DAL.Repostiories
             //returns the user doc that matches this id
             return networkDb.GetUsersTable().GetItem(id);
         }
-
+        public User GetUserFromDoc(Document userDoc)
+        {
+            //retreives a user from it's doc
+            return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
+        }
         public User GetUserById(string id)
         {
             //returns the user that matches this id,null if not exists
             Document userDoc = GetUserDocById(id);
             if (userDoc != null)
             {
-                return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
+                return GetUserFromDoc(userDoc);
             }
             else
             {
@@ -50,7 +50,7 @@ namespace DAL.Repostiories
 
         public ResponseEnum BlockUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
                 return graphContext.BlockUser(userId, onUserId);
             }
@@ -58,7 +58,7 @@ namespace DAL.Repostiories
 
         public ResponseEnum UnBlockUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
                 return graphContext.UnBlockUser(userId, onUserId);
             }
@@ -66,7 +66,7 @@ namespace DAL.Repostiories
 
         public ResponseEnum FollowUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
                 return graphContext.FollowUser(userId, onUserId);
             }
@@ -74,7 +74,7 @@ namespace DAL.Repostiories
 
         public ResponseEnum UnFollowUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
                 return graphContext.UnFollowUser(userId, onUserId);
             }
@@ -95,7 +95,8 @@ namespace DAL.Repostiories
                 newUser["Address"] = userRegister.Address;
                 newUser["WorkLocation"] = userRegister.WorkLocation;
                 networkDb.GetUsersTable().PutItem(newUser);
-                return GetUserById(userRegister.Username);
+                User user = GetUserById(userRegister.Username);
+                return user;
             }
             catch (Exception)
             {
@@ -116,7 +117,8 @@ namespace DAL.Repostiories
                 existingUser["Address"] = user.Address;
                 existingUser["WorkLocation"] = user.WorkLocation;
                 networkDb.GetUsersTable().PutItem(existingUser);
-                return GetUserById(user.Username);
+                User userEdited = GetUserById(user.Username);
+                return userEdited;
             }
             catch (Exception)
             {
@@ -128,7 +130,7 @@ namespace DAL.Repostiories
         {
             List<string> userNames = new List<string>();
 
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
                 userNames = graphContext.GetBlockedUsers(userId);
             }
@@ -141,7 +143,7 @@ namespace DAL.Repostiories
         {
             List<string> userNames = new List<string>();
 
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
                 userNames = graphContext.GetFollowingUsers(userId);
             }
@@ -175,6 +177,36 @@ namespace DAL.Repostiories
             {
                 return ResponseEnum.Failed;
             }
+        }
+
+        public List<User> SearchForUsers(string input)
+        {
+            //searches for users that matches this input
+            List<User> users = new List<User>();
+            ScanFilter scanFilter = new ScanFilter();
+            if (!string.IsNullOrWhiteSpace(input))
+            {
+                input = input.ToLower();
+                scanFilter.AddCondition(DatabaseConfigs.UsersKey, ScanOperator.Contains, new DynamoDBEntry[] { input });
+                scanFilter.AddCondition("FirstName", ScanOperator.Contains, new DynamoDBEntry[] { input });
+                scanFilter.AddCondition("LastName", ScanOperator.Contains, new DynamoDBEntry[] { input });
+                scanFilter.AddCondition("Address", ScanOperator.Contains, new DynamoDBEntry[] { input });
+                ScanOperationConfig config = new ScanOperationConfig()
+                {
+                    AttributesToGet = new List<string> { DatabaseConfigs.UsersKey },
+                    Filter = scanFilter
+                };
+                config.Select = SelectValues.SpecificAttributes;
+                Search search = networkDb.GetUsersTable().Scan(config);
+                if (search.Count > 0)
+                {
+                    foreach (var item in search.GetNextSet())
+                    {
+                        users.Add(GetUserById(item[DatabaseConfigs.UsersKey]));
+                    }
+                }
+            }
+            return users;
         }
     }
 }

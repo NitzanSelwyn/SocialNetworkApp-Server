@@ -73,5 +73,11 @@ namespace BL.Managers
                 return TryRegister(userRegister);
             }
         }
+
+        public List<User> SearchForUsers(string input)
+        {
+            //searches for users that matches this input
+            return repository.SearchForUsers(input);
+        }
     }
 }

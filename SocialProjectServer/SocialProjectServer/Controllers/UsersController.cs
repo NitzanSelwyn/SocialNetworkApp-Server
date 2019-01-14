@@ -140,7 +140,14 @@ namespace SocialProjectServer.Controllers
             {
                 return Conflict();
             }
-
+        }
+        [HttpPost]
+        [Route(RouteConfigs.SearchUsersRoute)]
+        public IHttpActionResult SearchForUsers([FromBody]string input)
+        {
+            //search for users that matches this input
+            List<User> users = usersManager.SearchForUsers(input);
+            return Ok(users);
         }
     }
 }

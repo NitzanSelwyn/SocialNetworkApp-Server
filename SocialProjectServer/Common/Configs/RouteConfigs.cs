@@ -33,6 +33,7 @@ namespace Common.Configs
         public const string UserRegisterRoute = "Api/Users/UserRegister";
         public const string UsernameExistsRoute = "Api/Users/UsernameExists";
         public const string EditUserDetailsRoute = "Api/Users/EditUserDetails";
+        public const string SearchUsersRoute = "Api/Users/SearchForUsers";
 
         public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
 

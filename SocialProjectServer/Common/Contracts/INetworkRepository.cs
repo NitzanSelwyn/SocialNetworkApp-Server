@@ -19,11 +19,11 @@ namespace Common.Contracts
         ResponseEnum UnBlockUser(string userId, string onUserId);
         ResponseEnum FollowUser(string userId, string onUserId);
         ResponseEnum UnFollowUser(string userId, string onUserId);
-
         List<UserRepresentation> GetBlockedUsers(string userId);
         List<UserRepresentation> GetFollowingUsers(string userId);
         Document GetUserDocById(string id);
         User EditUserDetails(User user);
         ResponseEnum EditPassword(EditPassword editPassword);
+        List<User> SearchForUsers(string input);
     }
 }
