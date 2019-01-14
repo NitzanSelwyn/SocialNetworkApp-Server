@@ -11,10 +11,15 @@ namespace Common.Models
 
         public string Author { get; set; }
 
+        public string PostId { get; set; }
+
         public string Content { get; set; }
 
         public byte[] Image { get; set; }
 
         public string ImageLink { get; set; }
+
+        public List<Comment> CommentList { get; set; }
+
     }
 }

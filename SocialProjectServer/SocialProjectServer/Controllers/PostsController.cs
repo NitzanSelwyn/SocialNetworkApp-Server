@@ -55,7 +55,7 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(RouteConfigs.GetFolowersPosts)]
         public List<Post> GetFolowersPosts([FromBody]string userName)
         {
