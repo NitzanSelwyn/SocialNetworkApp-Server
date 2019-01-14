@@ -14,11 +14,13 @@ namespace DAL.Databases
         AmazonDynamoDBConfig clientConfig { get; set; }
         AmazonDynamoDBClient client { get; set; }
         Table usersTable { get; set; }
+        Table postIdTable { get; set; }
         public DynamoDB()
         {
             clientConfig = new AmazonDynamoDBConfig();
             client = new AmazonDynamoDBClient(clientConfig);
             usersTable = Table.LoadTable(client, DatabaseConfigs.UsersTable);
+            postIdTable = Table.LoadTable(client, DatabaseConfigs.PostIdTable);
 
         }
         public Table GetUsersTable()
@@ -26,6 +28,10 @@ namespace DAL.Databases
             //returns the users table
             return usersTable;
         }
-        
+
+        public Table GetPostTable()
+        {
+            return postIdTable;
+        }
     }
 }

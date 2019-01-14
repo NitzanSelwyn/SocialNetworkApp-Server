@@ -57,6 +57,7 @@
     <Compile Include="Configs\DatabaseConfigs.cs" />
     <Compile Include="Configs\MainConfigs.cs" />
     <Compile Include="Configs\RouteConfigs.cs" />
+    <Compile Include="Contracts\Managers\IPostManager.cs" />
     <Compile Include="Contracts\Managers\ISettingsManager.cs" />
     <Compile Include="Contracts\Services\IAuthService.cs" />
     <Compile Include="Contracts\Services\IHttpClient.cs" />

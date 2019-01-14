@@ -1,6 +1,7 @@
 ﻿using Common.Enums;
 using Common.Models;
 using Common.Models.TempModels;
+using DAL.Repostiories;
 using Neo4j.Driver.V1;
 using Newtonsoft.Json;
 using SocialProjectServer.Models;
@@ -15,7 +16,7 @@ namespace DAL.Databases
     public class Neo4jDB : IDisposable
     {
         private readonly IDriver _driver;
-
+        
         public Neo4jDB(string uri, string user, string password)
         {
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
@@ -29,9 +30,10 @@ namespace DAL.Databases
 
         public void UploadPost(Post post)
         {
+
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\"}})" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
             using (var session = _driver.Session())
@@ -83,10 +85,10 @@ namespace DAL.Databases
             }
         }
 
-        public void DeletePost(Post post)
+        public void DeletePost(string postId)
         {
             var statment = $"MATCH (p:Post)" +
-                           $"WHERE p.PostId = {post.PostId}" +
+                           $"WHERE p.PostId = \"{postId}\"" +
                            $"DETACH DELETE p";
 
             using (var session = _driver.Session())
