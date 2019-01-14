@@ -31,7 +31,6 @@ namespace SocialProjectServer.Services
                 }
                 catch (AggregateException)
                 {
-
                     return new Tuple<object, HttpStatusCode>(null, HttpStatusCode.ExpectationFailed);
                 }
 

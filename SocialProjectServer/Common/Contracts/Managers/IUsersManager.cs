@@ -18,5 +18,6 @@ namespace Common.Contracts
         User GetUserById(string id);
         User EditUserDetails(User user);
         User FacebookLogin(FacebookUser user);
+        List<User> SearchForUsers(string input);
     }
 }
