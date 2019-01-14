@@ -68,6 +68,8 @@
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\Post.cs" />
+    <Compile Include="Models\TempModels\EditPassword.cs" />
+    <Compile Include="Models\TempModels\FacebookUser.cs" />
     <Compile Include="Models\TempModels\UserLogin.cs" />
     <Compile Include="Models\TempModels\UserRegister.cs" />
     <Compile Include="Models\TempModels\UserRepresentation.cs" />

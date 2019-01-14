@@ -108,7 +108,7 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{like.postId}\"" +
-                           $"CREATE (u:User)-[:Like]->(p)" +
+                           $"CREATE UNIQUE (u:User)-[:Like]->(p)" +
                            $"WHERE u.Username = \"{like.UserName}\"" +
                            $"RETURN *";
 
@@ -122,8 +122,8 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{comment.postId}\"" +
-                           $"CREATE (c:Comment {{Content: \"{comment.Content}\", Author: \"{comment.Author}\"}})-[:CommentedOn]->(p)" +
-                           $"WHERE u.Username = \"{comment.Author}\"" +
+                           $"CREATE (c:Comment {{Content: \"{comment.Text}\", Author: \"{comment.CommenterName}\", Date: {comment.CommentedDate}}})-[:CommentedOn]->(p)" +
+                           $"WHERE u.Username = \"{comment.CommenterName}\"" +
                            $"CREATE (u)-[:Comment]->(c)" +
                            $"RETURN *";
 
@@ -136,10 +136,11 @@ namespace DAL.Databases
         public ResponseEnum BlockUser(string userName, string blockedUserName)
         {
             var statment = $"MATCH (u:User)" +
-                           $"WHERE u.Username = \"{userName}\"" +
-                           $"CREATE (u)-[:Block]->(bu:User)" +
-                           $"WHERE bu.Username = \"{blockedUserName}\"" +
-                           $"RETURN *";
+               $"WHERE u.Username = \"{userName}\"" +
+               $"MATCH (bu:User)" +
+               $"WHERE bu.Username = \"{blockedUserName}\"" +
+               $"CREATE UNIQUE (u)-[:Block]->(bu)" +
+               $"RETURN *";
 
             try
             {
@@ -152,7 +153,7 @@ namespace DAL.Databases
             catch (Exception)
             {
 
-               return ResponseEnum.Failed;
+                return ResponseEnum.Failed;
             }
         }
 
@@ -177,12 +178,13 @@ namespace DAL.Databases
             }
         }
 
-        public ResponseEnum FollowUser(string userName, string blockedUserName)
+        public ResponseEnum FollowUser(string userName, string UserToFollow)
         {
             var statment = $"MATCH (u:User)" +
                $"WHERE u.Username = \"{userName}\"" +
-               $"CREATE (u)-[:Follow]->(bu:User)" +
-               $"WHERE bu.Username = \"{blockedUserName}\"" +
+               $"MATCH (bu:User)" +
+               $"WHERE bu.Username = \"{UserToFollow}\"" +
+               $"CREATE UNIQUE (u)-[:Follow]->(bu)" +
                $"RETURN *";
 
             try
@@ -269,7 +271,7 @@ namespace DAL.Databases
             var commentList = new List<Comment>();
 
             var statment = $"MATCH (c:Comment)-[:CommentedOn]->(p:Post)" +
-                           $"WHERE p.PostId = {postId}" +
+                           $"WHERE p.PostId = \"{postId}\"" +
                            $"RETURN c";
 
             using (var session = _driver.Session())

@@ -24,6 +24,8 @@ namespace Common.Configs
         public const string DeletePost = "Api/Post";
         public const string Like = "Api/Like";
         public const string CommentOnPost = "Api/Comment";
+        public const string GetPostsComments = "Api/GetPostsComments";
+
 
         //USERS
         public const string GetMyUserRoute = "Api/users/GetUserByToken";

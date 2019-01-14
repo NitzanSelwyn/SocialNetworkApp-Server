@@ -8,11 +8,10 @@ namespace Common.Models
 {
     public class Comment
     {
-        public string Author { get; set; }
-
-        public string Content { get; set; }
-
+        public string CommenterName { get; set; }
+        public DateTime CommentedDate { get; set; }
+        public string Text { get; set; }
         public string postId { get; set; }
-       
+
     }
 }

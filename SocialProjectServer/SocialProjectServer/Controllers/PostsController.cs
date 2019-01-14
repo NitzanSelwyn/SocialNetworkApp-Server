@@ -95,6 +95,16 @@ namespace SocialProjectServer.Controllers
             }
         }
 
+        [HttpPost]
+        [Route(RouteConfigs.GetPostsComments)]
+        public List<Comment> GetPostsComments([FromBody]string postId)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+              return  graphContext.GetCommentsOfPost(postId);
+            }
+        }
+
         private static string UploadFile(byte[] file, string authorName)
         {
             var image = new MemoryStream(file);
