@@ -18,12 +18,33 @@ namespace DAL.Repostiories
     public class NetworkRepository : INetworkRepository
     {
         public INetworkDatabase networkDb { get; set; }
-
-        public IPostManager postManager { get; set; }
+        public Dictionary<string, User> Users { get; set; }
 
         public NetworkRepository(INetworkDatabase networkDb)
         {
             this.networkDb = networkDb;
+            InitAndLoadUsers();
+        }
+
+        private void InitAndLoadUsers()
+        {
+            //inits and loads the users from the database
+            Users = new Dictionary<string, User>();
+            ScanFilter scanFilter = new ScanFilter();
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                AttributesToGet = new List<string> { DatabaseConfigs.UsersKey },
+                Filter = scanFilter
+            };
+            config.Select = SelectValues.SpecificAttributes;
+            Search search = networkDb.GetUsersTable().Scan(config);
+            if (search.Count > 0)
+            {
+                foreach (var item in search.GetNextSet())
+                {
+                    Users.Add(item[DatabaseConfigs.UsersKey], GetUserById(item[DatabaseConfigs.UsersKey]));
+                }
+            }
         }
 
         public Document GetUserDocById(string id)
@@ -90,20 +111,25 @@ namespace DAL.Repostiories
             try
             {
                 Document newUser = new Document();
-                newUser[DatabaseConfigs.UsersKey] = userRegister.Username;
-                newUser["FirstName"] = userRegister.FirstName;
-                newUser["LastName"] = userRegister.LastName;
+                newUser[DatabaseConfigs.UsersKey] = userRegister.Username.ToLower();
+                newUser["FirstName"] = userRegister.FirstName.ToLower();
+                newUser["LastName"] = userRegister.LastName.ToLower();
                 newUser["Password"] = userRegister.Password;
                 newUser["BirthDate"] = userRegister.BirthDate;
                 newUser["Email"] = userRegister.Email;
-                newUser["Address"] = userRegister.Address;
-                newUser["WorkLocation"] = userRegister.WorkLocation;
+                newUser["Address"] = userRegister.Address.ToLower();
+                newUser["WorkLocation"] = userRegister.WorkLocation.ToLower();
                 networkDb.GetUsersTable().PutItem(newUser);
                 User user = GetUserById(userRegister.Username);
-                postManager.RegisterUserToNeo4j(userRegister.Username);
+                Users.Add(user.Username, user);
+                using (Neo4jDB db = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    db.RegisterUserToNeo4j(userRegister.Username);
+                }
+
                 return user;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return null;
             }
@@ -115,14 +141,15 @@ namespace DAL.Repostiories
             try
             {
                 Document existingUser = GetUserDocById(user.Username);
-                existingUser["FirstName"] = user.FirstName;
-                existingUser["LastName"] = user.LastName;
+                existingUser["FirstName"] = user.FirstName.ToLower();
+                existingUser["LastName"] = user.LastName.ToLower();
                 existingUser["BirthDate"] = user.BirthDate;
                 existingUser["Email"] = user.Email;
-                existingUser["Address"] = user.Address;
-                existingUser["WorkLocation"] = user.WorkLocation;
+                existingUser["Address"] = user.Address.ToLower();
+                existingUser["WorkLocation"] = user.WorkLocation.ToLower();
                 networkDb.GetUsersTable().PutItem(existingUser);
                 User userEdited = GetUserById(user.Username);
+                Users[userEdited.Username] = userEdited;
                 return userEdited;
             }
             catch (Exception)
@@ -186,32 +213,8 @@ namespace DAL.Repostiories
 
         public List<User> SearchForUsers(string input)
         {
-            //searches for users that matches this input
-            List<User> users = new List<User>();
-            ScanFilter scanFilter = new ScanFilter();
-            if (!string.IsNullOrWhiteSpace(input))
-            {
-                input = input.ToLower();
-                scanFilter.AddCondition(DatabaseConfigs.UsersKey, ScanOperator.Contains, new DynamoDBEntry[] { input });
-                scanFilter.AddCondition("FirstName", ScanOperator.Contains, new DynamoDBEntry[] { input });
-                scanFilter.AddCondition("LastName", ScanOperator.Contains, new DynamoDBEntry[] { input });
-                scanFilter.AddCondition("Address", ScanOperator.Contains, new DynamoDBEntry[] { input });
-                ScanOperationConfig config = new ScanOperationConfig()
-                {
-                    AttributesToGet = new List<string> { DatabaseConfigs.UsersKey },
-                    Filter = scanFilter
-                };
-                config.Select = SelectValues.SpecificAttributes;
-                Search search = networkDb.GetUsersTable().Scan(config);
-                if (search.Count > 0)
-                {
-                    foreach (var item in search.GetNextSet())
-                    {
-                        users.Add(GetUserById(item[DatabaseConfigs.UsersKey]));
-                    }
-                }
-            }
-            return users;
+            input = input.ToLower();
+            return Users.Values.Where(u => u.Username.ToLower().Contains(input) || u.FirstName.ToLower().Contains(input) || u.LastName.ToLower().Contains(input)).ToList();
         }
 
         public string GetLastPostIdAndUpdate()

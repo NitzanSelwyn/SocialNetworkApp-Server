@@ -83,7 +83,7 @@ namespace BL.Managers
         {
             using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
-                return graphContext.BlockedByUser(myId, userToViewId)||graphContext.BlockedByUser(userToViewId,myId);
+                return graphContext.GetBlockedUsers(myId).Contains(userToViewId)||graphContext.GetBlockedUsers(userToViewId).Contains(myId);
             }
         }
     }
