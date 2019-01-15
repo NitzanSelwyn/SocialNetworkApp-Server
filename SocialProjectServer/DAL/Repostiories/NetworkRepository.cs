@@ -129,7 +129,7 @@ namespace DAL.Repostiories
 
                 return user;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

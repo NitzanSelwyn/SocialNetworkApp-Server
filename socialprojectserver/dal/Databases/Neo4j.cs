@@ -33,7 +33,7 @@ namespace DAL.Databases
 
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\"}})" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\", DatePosted: \"{post.DatePosted}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
             try
@@ -77,8 +77,9 @@ namespace DAL.Databases
             List<Post> postList = new List<Post>();
 
             var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
-                           $"WHERE u.Username = \"{userName}\" AMD NOT EXISTS ((u)-[:Blocked]-(u2))" +                  
-                           $"RETURN p";
+                           $"WHERE u.Username = \"{userName}\" AND " +
+                           $"NOT EXISTS ((u)-[:Blocked]-(u2))" +                  
+                           $"RETURN p ORDER BY p.DatePosted DESC";
 
             using (var session = _driver.Session())
             {
@@ -117,7 +118,7 @@ namespace DAL.Databases
 
         public ResponseEnum RegisterUserToNeo4j(string userName)
         {
-            var statment = $"CREATE UNIQUE (u:User {{Username: \"{userName}\"}})";
+            var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
 
             try
             {
@@ -139,7 +140,7 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{like.postId}\"" +
-                           $"MERGE (u:User)-[:Like]->(p)" +
+                           $"MERGE (u:User)-[:Liked]->(p)" +
                            $"WHERE u.Username = \"{like.UserName}\"" +
                            $"RETURN *";
             try
