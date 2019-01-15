@@ -7,6 +7,7 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Common.Configs;
 using Common.Contracts.Managers;
+using Common.Enums;
 using Common.Models;
 using DAL.Databases;
 using SocialProjectServer.Containers;
@@ -30,9 +31,17 @@ namespace SocialProjectServer.Controllers
 
         [HttpPost]
         [Route(RouteConfigs.PostNewMessage)]
-        public void AddNewPost([FromBody]Post post)
+        public IHttpActionResult AddNewPost([FromBody]Post post)
         {
-            postManager.AddNewPost(post);
+            ResponseEnum response = postManager.AddNewPost(post);
+            if (response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
         }
 
         [HttpPost]
@@ -51,23 +60,48 @@ namespace SocialProjectServer.Controllers
 
         [HttpDelete]
         [Route(RouteConfigs.DeletePost)]
-        public void DeletePost([FromBody]string postId)
+        public IHttpActionResult DeletePost([FromBody]string postId)
         {
-            postManager.DeletePost(postId);
+            ResponseEnum response = postManager.DeletePost(postId);
+
+            if (response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
         }
 
         [HttpPost]
         [Route(RouteConfigs.Like)]
-        public void LikePost([FromBody]Like like)
+        public IHttpActionResult LikePost([FromBody]Like like)
         {
-            postManager.LikePost(like);
+            ResponseEnum response = postManager.LikePost(like);
+            if (response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
         }
 
         [HttpPost]
         [Route(RouteConfigs.CommentOnPost)]
-        public void CommentOnPost([FromBody]Comment comment)
+        public IHttpActionResult CommentOnPost([FromBody]Comment comment)
         {
-            postManager.CommentOnPos(comment);
+            ResponseEnum response = postManager.CommentOnPos(comment);
+            if (response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
         }
 
         [HttpPost]

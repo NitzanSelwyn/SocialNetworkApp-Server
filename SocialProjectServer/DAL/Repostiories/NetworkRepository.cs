@@ -1,6 +1,7 @@
 ﻿using Amazon.DynamoDBv2.DocumentModel;
 using Common.Configs;
 using Common.Contracts;
+using Common.Contracts.Managers;
 using Common.Enums;
 using Common.Models.TempModels;
 using DAL.Databases;
@@ -17,6 +18,8 @@ namespace DAL.Repostiories
     public class NetworkRepository : INetworkRepository
     {
         public INetworkDatabase networkDb { get; set; }
+
+        public IPostManager postManager { get; set; }
 
         public NetworkRepository(INetworkDatabase networkDb)
         {
@@ -97,6 +100,7 @@ namespace DAL.Repostiories
                 newUser["WorkLocation"] = userRegister.WorkLocation;
                 networkDb.GetUsersTable().PutItem(newUser);
                 User user = GetUserById(userRegister.Username);
+                postManager.RegisterUserToNeo4j(userRegister.Username);
                 return user;
             }
             catch (Exception)

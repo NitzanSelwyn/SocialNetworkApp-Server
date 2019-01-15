@@ -28,7 +28,7 @@ namespace DAL.Databases
             _driver?.Dispose();
         }
 
-        public void UploadPost(Post post)
+        public ResponseEnum UploadPost(Post post)
         {
 
             var statment = $"MATCH (u:User)" +
@@ -36,9 +36,18 @@ namespace DAL.Databases
                            $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
@@ -85,42 +94,73 @@ namespace DAL.Databases
             }
         }
 
-        public void DeletePost(string postId)
+        public ResponseEnum DeletePost(string postId)
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.PostId = \"{postId}\"" +
                            $"DETACH DELETE p";
 
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
-        public void RegisterUserToNeo4j(string userName)
+        public ResponseEnum RegisterUserToNeo4j(string userName)
         {
             var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
-            using (var session = _driver.Session())
+
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
-        public void LikePost(Like like)
+        public ResponseEnum LikePost(Like like)
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{like.postId}\"" +
                            $"CREATE UNIQUE (u:User)-[:Like]->(p)" +
                            $"WHERE u.Username = \"{like.UserName}\"" +
                            $"RETURN *";
-
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
-        public void CommentOnPost(Comment comment)
+        public ResponseEnum CommentOnPost(Comment comment)
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{comment.postId}\"" +
@@ -129,9 +169,19 @@ namespace DAL.Databases
                            $"CREATE (u)-[:Comment]->(c)" +
                            $"RETURN *";
 
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 

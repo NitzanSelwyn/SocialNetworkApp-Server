@@ -4,14 +4,12 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Common.Contracts;
 using Common.Contracts.Managers;
+using Common.Enums;
 using Common.Models;
 using DAL.Databases;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BL.Managers
 {
@@ -31,7 +29,7 @@ namespace BL.Managers
             this.repository = repository;
         }
 
-        public void AddNewPost(Post post)
+        public ResponseEnum AddNewPost(Post post)
         {
             if (post.Image != null)
             {
@@ -43,23 +41,31 @@ namespace BL.Managers
 
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                graphContext.UploadPost(post);
+              return  graphContext.UploadPost(post);
             }
         }
 
-        public void CommentOnPos(Comment comment)
+        public ResponseEnum RegisterUserToNeo4j(string userName)
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                graphContext.CommentOnPost(comment);
+                return graphContext.RegisterUserToNeo4j(userName);
             }
         }
 
-        public void DeletePost(string postId)
+        public ResponseEnum CommentOnPos(Comment comment)
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                graphContext.DeletePost(postId);
+               return graphContext.CommentOnPost(comment);
+            }
+        }
+
+        public ResponseEnum DeletePost(string postId)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+               return graphContext.DeletePost(postId);
             }
         }
 
@@ -87,11 +93,11 @@ namespace BL.Managers
             }
         }
 
-        public void LikePost(Like like)
+        public ResponseEnum LikePost(Like like)
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                graphContext.LikePost(like);
+               return graphContext.LikePost(like);
             }
         }
 
