@@ -16,7 +16,7 @@ namespace DAL.Databases
     public class Neo4jDB : IDisposable
     {
         private readonly IDriver _driver;
-        
+
         public Neo4jDB(string uri, string user, string password)
         {
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
@@ -76,9 +76,10 @@ namespace DAL.Databases
         {
             List<Post> postList = new List<Post>();
 
-            var statment = $"MATCH (u:User)-[:Follow]->(u2:User)" +
+            var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
                            $"WHERE u.Username = \"{userName}\"" +
-                           $"MATCH (u2)-[:Posted]->(p:Post)" +
+                           $"MATCH (u)-[b:Blocked]->[u2]" +
+                           $"AMD NOT EXISTS ((u)-[:Blocked]-(u2))" +                         
                            $"RETURN p";
 
             using (var session = _driver.Session())
@@ -140,7 +141,7 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{like.postId}\"" +
-                           $"CREATE UNIQUE (u:User)-[:Like]->(p)" +
+                           $"MERGE (u:User)-[:Like]->(p)" +
                            $"WHERE u.Username = \"{like.UserName}\"" +
                            $"RETURN *";
             try
@@ -191,7 +192,7 @@ namespace DAL.Databases
                $"WHERE u.Username = \"{userName}\"" +
                $"MATCH (bu:User)" +
                $"WHERE bu.Username = \"{blockedUserName}\"" +
-               $"CREATE UNIQUE (u)-[:Block]->(bu)" +
+               $"MERGE (u)-[:Block]->(bu)" +
                $"RETURN *";
 
             try
@@ -236,7 +237,7 @@ namespace DAL.Databases
                $"WHERE u.Username = \"{userName}\"" +
                $"MATCH (bu:User)" +
                $"WHERE bu.Username = \"{UserToFollow}\"" +
-               $"CREATE UNIQUE (u)-[:Follow]->(bu)" +
+               $"MERGE (u)-[:Follow]->(bu)" +
                $"RETURN *";
 
             try
