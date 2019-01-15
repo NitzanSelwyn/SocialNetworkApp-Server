@@ -25,6 +25,9 @@ namespace Common.Models
 
         public DateTime DatePosted { get; set; }
 
+        public Like Like { get; set; }
+
+
 
     }
 }
