@@ -41,6 +41,7 @@ namespace Common.Configs
         //SETTINGS
         public const string ManageRequestRoute = "Api/Settings/ManageRequest";
         public const string GetBlockedUsers = "Api/Settings/GetBlockedUsers";
+        public const string GetFollowingUsers = "Api/Settings/GetFollowingUsers";
         public const string EditUserPasswordRoute = "Api/Settings/ChangePassword";
     }
 }

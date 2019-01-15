@@ -49,7 +49,21 @@ namespace SocialProjectServer.Controllers
             {
                 return Conflict();
             }
-
         }
+        [HttpPost]
+        [Route(RouteConfigs.GetBlockedUsers)]
+        public IHttpActionResult GetBlockedUsers([FromBody]string username)
+        {
+            //returns my blocked users
+            return Ok(settingsManager.GetBlockedUsers(username));
+        }
+        [HttpPost]
+        [Route(RouteConfigs.GetFollowingUsers)]
+        public IHttpActionResult GetFollowingUsers([FromBody]string username)
+        {
+            //returns my blocked users
+            return Ok(settingsManager.GetFollowingUsers(username));
+        }
+
     }
 }

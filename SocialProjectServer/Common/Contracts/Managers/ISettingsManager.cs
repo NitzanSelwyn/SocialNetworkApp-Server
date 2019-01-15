@@ -12,5 +12,7 @@ namespace Common.Contracts.Managers
     {
         ResponseEnum ManageRequest(UserRequestModel request);
         ResponseEnum ChangePassword(EditPassword editPassword);
+        List<UserRepresentation> GetBlockedUsers(string userId);
+        List<UserRepresentation> GetFollowingUsers(string userId);
     }
 }
