@@ -34,6 +34,7 @@ namespace Common.Configs
         public const string UsernameExistsRoute = "Api/Users/UsernameExists";
         public const string EditUserDetailsRoute = "Api/Users/EditUserDetails";
         public const string SearchUsersRoute = "Api/Users/SearchForUsers";
+        public const string BlockedByUsersRoute = "Api/Users/BlockedByUser";
 
         public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
 
