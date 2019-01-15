@@ -19,5 +19,6 @@ namespace Common.Contracts
         User EditUserDetails(User user);
         User FacebookLogin(FacebookUser user);
         List<User> SearchForUsers(string input);
+        bool BlockedByUser(string myId, string userToViewId);
     }
 }

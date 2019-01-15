@@ -94,7 +94,11 @@ namespace DAL.Databases
                 var results = session.Run(statment).Consume();
             }
         }
-
+        public bool BlockedByUser(string myId,string userToViewId)
+        {
+            //checks if this user blocked me
+            return GetBlockedUsers(userToViewId).Contains(myId);
+        }
         public void RegisterUserToNeo4j(string userName)
         {
             var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";

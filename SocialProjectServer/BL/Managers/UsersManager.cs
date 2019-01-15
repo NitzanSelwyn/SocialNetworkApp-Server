@@ -79,5 +79,12 @@ namespace BL.Managers
             //searches for users that matches this input
             return repository.SearchForUsers(input);
         }
+        public bool BlockedByUser(string myId, string userToViewId)
+        {
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+            {
+                return graphContext.BlockedByUser(myId, userToViewId)||graphContext.BlockedByUser(userToViewId,myId);
+            }
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Common.Configs
         //POSTS
         public const string PostNewMessage = "Api/Post";
         public const string GetUsersPosts = "Api/Post/UsersPosts";
-        public const string GetFolowersPosts = "Api/Post/FolowersPosts";
+        public const string GetFolowersPosts = "Api/Post/FollowingPosts";
         public const string EditPost = "Api/Post/edit";
         public const string DeletePost = "Api/Post";
         public const string Like = "Api/Like";
@@ -32,6 +32,7 @@ namespace Common.Configs
         public const string UsernameExistsRoute = "Api/Users/UsernameExists";
         public const string EditUserDetailsRoute = "Api/Users/EditUserDetails";
         public const string SearchUsersRoute = "Api/Users/SearchForUsers";
+        public const string BlockedByUsersRoute = "Api/Users/BlockedByUser";
 
         public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
 

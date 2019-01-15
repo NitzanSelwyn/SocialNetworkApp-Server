@@ -127,6 +127,12 @@ namespace SocialProjectServer.Controllers
             }
         }
         [HttpPost]
+        [Route(RouteConfigs.BlockedByUsersRoute)]
+        public IHttpActionResult BlockedByUserCheck([FromBody]UserRequestModel request)
+        {
+            return Ok(usersManager.BlockedByUser(request.userId, request.onUserId));
+        }
+        [HttpPost]
         [Route(RouteConfigs.GetMyUserRoute)]
         public IHttpActionResult GetUserByToken([FromBody]string token)
         {
