@@ -77,9 +77,7 @@ namespace DAL.Databases
             List<Post> postList = new List<Post>();
 
             var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
-                           $"WHERE u.Username = \"{userName}\"" +
-                           $"MATCH (u)-[b:Blocked]->[u2]" +
-                           $"AMD NOT EXISTS ((u)-[:Blocked]-(u2))" +                         
+                           $"WHERE u.Username = \"{userName}\" AMD NOT EXISTS ((u)-[:Blocked]-(u2))" +                  
                            $"RETURN p";
 
             using (var session = _driver.Session())
@@ -119,7 +117,7 @@ namespace DAL.Databases
 
         public ResponseEnum RegisterUserToNeo4j(string userName)
         {
-            var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
+            var statment = $"CREATE UNIQUE (u:User {{Username: \"{userName}\"}})";
 
             try
             {
