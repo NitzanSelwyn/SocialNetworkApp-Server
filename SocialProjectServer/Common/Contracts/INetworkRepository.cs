@@ -25,5 +25,6 @@ namespace Common.Contracts
         User EditUserDetails(User user);
         ResponseEnum EditPassword(EditPassword editPassword);
         List<User> SearchForUsers(string input);
+        string GetLastPostIdAndUpdate();
     }
 }

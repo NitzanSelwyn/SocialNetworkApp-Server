@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Managers\PostManager.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="Managers\UsersManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

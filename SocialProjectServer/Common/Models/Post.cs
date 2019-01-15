@@ -21,5 +21,8 @@ namespace Common.Models
 
         public List<Comment> CommentList { get; set; }
 
+        public string FullName { get; set; }
+
+
     }
 }

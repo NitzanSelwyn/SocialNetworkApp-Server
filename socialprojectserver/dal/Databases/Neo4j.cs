@@ -1,6 +1,7 @@
 ﻿using Common.Enums;
 using Common.Models;
 using Common.Models.TempModels;
+using DAL.Repostiories;
 using Neo4j.Driver.V1;
 using Newtonsoft.Json;
 using SocialProjectServer.Models;
@@ -15,7 +16,7 @@ namespace DAL.Databases
     public class Neo4jDB : IDisposable
     {
         private readonly IDriver _driver;
-
+        
         public Neo4jDB(string uri, string user, string password)
         {
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
@@ -27,16 +28,26 @@ namespace DAL.Databases
             _driver?.Dispose();
         }
 
-        public void UploadPost(Post post)
+        public ResponseEnum UploadPost(Post post)
         {
+
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\"}})" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
@@ -83,67 +94,105 @@ namespace DAL.Databases
             }
         }
 
-        public void DeletePost(Post post)
+        public ResponseEnum DeletePost(string postId)
         {
             var statment = $"MATCH (p:Post)" +
-                           $"WHERE p.PostId = {post.PostId}" +
+                           $"WHERE p.PostId = \"{postId}\"" +
                            $"DETACH DELETE p";
 
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
             }
-        }
-        public bool BlockedByUser(string myId,string userToViewId)
-        {
-            //checks if this user blocked me
-            return GetBlockedUsers(userToViewId).Contains(myId);
-        }
-        public void RegisterUserToNeo4j(string userName)
-        {
-            var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
-            using (var session = _driver.Session())
+            catch (Exception)
             {
-                var results = session.Run(statment).Consume();
+
+                return ResponseEnum.Failed;
             }
         }
 
-        public void LikePost(Like like)
+        public ResponseEnum RegisterUserToNeo4j(string userName)
+        {
+            var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        public ResponseEnum LikePost(Like like)
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{like.postId}\"" +
-                           $"CREATE (u:User)-[:Like]->(p)" +
+                           $"CREATE UNIQUE (u:User)-[:Like]->(p)" +
                            $"WHERE u.Username = \"{like.UserName}\"" +
                            $"RETURN *";
-
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
-        public void CommentOnPost(Comment comment)
+        public ResponseEnum CommentOnPost(Comment comment)
         {
             var statment = $"MATCH (p:Post)" +
                            $"WHERE p.postId = \"{comment.postId}\"" +
-                           $"CREATE (c:Comment {{Content: \"{comment.Content}\", Author: \"{comment.Author}\"}})-[:CommentedOn]->(p)" +
-                           $"WHERE u.Username = \"{comment.Author}\"" +
+                           $"CREATE (c:Comment {{Content: \"{comment.Text}\", Author: \"{comment.CommenterName}\", Date: {comment.CommentedDate}}})-[:CommentedOn]->(p)" +
+                           $"WHERE u.Username = \"{comment.CommenterName}\"" +
                            $"CREATE (u)-[:Comment]->(c)" +
                            $"RETURN *";
 
-            using (var session = _driver.Session())
+            try
             {
-                var results = session.Run(statment).Consume();
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
 
         public ResponseEnum BlockUser(string userName, string blockedUserName)
         {
             var statment = $"MATCH (u:User)" +
-                           $"WHERE u.Username = \"{userName}\"" +
-                           $"CREATE (u)-[:Block]->(bu:User)" +
-                           $"WHERE bu.Username = \"{blockedUserName}\"" +
-                           $"RETURN *";
+               $"WHERE u.Username = \"{userName}\"" +
+               $"MATCH (bu:User)" +
+               $"WHERE bu.Username = \"{blockedUserName}\"" +
+               $"CREATE UNIQUE (u)-[:Block]->(bu)" +
+               $"RETURN *";
 
             try
             {
@@ -156,7 +205,7 @@ namespace DAL.Databases
             catch (Exception)
             {
 
-               return ResponseEnum.Failed;
+                return ResponseEnum.Failed;
             }
         }
 
@@ -181,12 +230,13 @@ namespace DAL.Databases
             }
         }
 
-        public ResponseEnum FollowUser(string userName, string blockedUserName)
+        public ResponseEnum FollowUser(string userName, string UserToFollow)
         {
             var statment = $"MATCH (u:User)" +
                $"WHERE u.Username = \"{userName}\"" +
-               $"CREATE (u)-[:Follow]->(bu:User)" +
-               $"WHERE bu.Username = \"{blockedUserName}\"" +
+               $"MATCH (bu:User)" +
+               $"WHERE bu.Username = \"{UserToFollow}\"" +
+               $"CREATE UNIQUE (u)-[:Follow]->(bu)" +
                $"RETURN *";
 
             try
@@ -273,7 +323,7 @@ namespace DAL.Databases
             var commentList = new List<Comment>();
 
             var statment = $"MATCH (c:Comment)-[:CommentedOn]->(p:Post)" +
-                           $"WHERE p.PostId = {postId}" +
+                           $"WHERE p.PostId = \"{postId}\"" +
                            $"RETURN c";
 
             using (var session = _driver.Session())

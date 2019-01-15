@@ -10,5 +10,6 @@ namespace DAL.Databases
     public interface INetworkDatabase
     {
         Table GetUsersTable();
+        Table GetPostTable();
     }
 }

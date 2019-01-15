@@ -20,5 +20,8 @@ namespace Common.Configs
 
         public const string CommentsTable = "Comments";
         public const string CommentsKey = "id";
+
+        public const string PostIdTable = "Configs";
+        public const string PostIdKey = "id";
     }
 }

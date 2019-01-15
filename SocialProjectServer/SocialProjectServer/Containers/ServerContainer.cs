@@ -35,6 +35,7 @@ namespace SocialProjectServer.Containers
                 //Managers
                 container.Register<IUsersManager, UsersManager>(Lifestyle.Singleton);
                 container.Register<ISettingsManager, SettingsManager>(Lifestyle.Singleton);
+                container.Register<IPostManager, PostManager>(Lifestyle.Singleton);
             }
 
         }

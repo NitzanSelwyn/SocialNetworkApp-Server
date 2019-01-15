@@ -1,6 +1,7 @@
 ﻿using Amazon.DynamoDBv2.DocumentModel;
 using Common.Configs;
 using Common.Contracts;
+using Common.Contracts.Managers;
 using Common.Enums;
 using Common.Models.TempModels;
 using DAL.Databases;
@@ -18,6 +19,7 @@ namespace DAL.Repostiories
     {
         public INetworkDatabase networkDb { get; set; }
 
+        public IPostManager postManager { get; set; }
 
         public NetworkRepository(INetworkDatabase networkDb)
         {
@@ -29,11 +31,13 @@ namespace DAL.Repostiories
             //returns the user doc that matches this id
             return networkDb.GetUsersTable().GetItem(id);
         }
+
         public User GetUserFromDoc(Document userDoc)
         {
             //retreives a user from it's doc
             return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
         }
+
         public User GetUserById(string id)
         {
             //returns the user that matches this id,null if not exists
@@ -96,6 +100,7 @@ namespace DAL.Repostiories
                 newUser["WorkLocation"] = userRegister.WorkLocation;
                 networkDb.GetUsersTable().PutItem(newUser);
                 User user = GetUserById(userRegister.Username);
+                postManager.RegisterUserToNeo4j(userRegister.Username);
                 return user;
             }
             catch (Exception)
@@ -164,7 +169,6 @@ namespace DAL.Repostiories
             return userRepresentations;
         }
 
-
         public ResponseEnum EditPassword(EditPassword editPassword)
         {
             try
@@ -174,7 +178,7 @@ namespace DAL.Repostiories
                 networkDb.GetUsersTable().PutItem(userDoc);
                 return ResponseEnum.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return ResponseEnum.Failed;
             }
@@ -208,6 +212,13 @@ namespace DAL.Repostiories
                 }
             }
             return users;
+        }
+
+        public string GetLastPostIdAndUpdate()
+        {
+            //var table = networkDb.GetPostTable;
+            //return table["LastPostId"].AsString();
+            return "";
         }
     }
 }
