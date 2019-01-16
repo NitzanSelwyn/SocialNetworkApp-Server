@@ -50,12 +50,11 @@ namespace DAL.Databases
                     var results = session.Run(statment).Consume();
                 }
 
-                Dispose();
-                return ResponseEnum.Succeeded;
+                               return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -83,7 +82,7 @@ namespace DAL.Databases
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                     postList.Add(JsonConvert.DeserializeObject<Post>(nodeProps));
                 }
-                Dispose();
+                
                 return postList;
             }
         }
@@ -113,8 +112,7 @@ namespace DAL.Databases
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                     postList.Add(JsonConvert.DeserializeObject<Post>(nodeProps));
                 }
-                Dispose();
-
+              
                 return postList;
             }
         }
@@ -139,12 +137,12 @@ namespace DAL.Databases
                     var results = session.Run(statment).Consume();
                 }
 
-                Dispose();
+               
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+              
                 return ResponseEnum.Failed;
             }
         }
@@ -165,14 +163,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment).Consume();
                 }
-                Dispose();
-
+              
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
-
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -198,12 +194,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment).Consume();
                 }
-                Dispose();
+               
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -229,12 +225,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment).Consume();
                 }
-                Dispose();
+                
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -261,12 +257,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-                Dispose();
+               
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -290,12 +286,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-                Dispose();
+               
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -320,12 +316,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-                Dispose();
+               
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+               
                 return ResponseEnum.Failed;
             }
         }
@@ -349,12 +345,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-                Dispose();
+              
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-                Dispose();
+              
                 return ResponseEnum.Failed;
             }
         }
@@ -384,7 +380,7 @@ namespace DAL.Databases
                     usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
                 }       
             }
-            Dispose();
+            
             return usertList;
         }
 
@@ -414,7 +410,7 @@ namespace DAL.Databases
                     usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
                 }
             }
-            Dispose();
+           
 
             return usertList;
         }
@@ -444,7 +440,7 @@ namespace DAL.Databases
                     commentList.Add(JsonConvert.DeserializeObject<Comment>(nodeProps));
                 } 
             }
-            Dispose();
+            
             return commentList;
         }
     }
