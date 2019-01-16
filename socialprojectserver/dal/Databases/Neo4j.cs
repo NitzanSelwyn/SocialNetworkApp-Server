@@ -222,7 +222,7 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (p:Post),(u:User)" +
                            $"WHERE p.PostId = \"{comment.postId}\" AND u.Username = \"{comment.CommenterName}\"" +
-                           $"CREATE (c:Comment {{Content: \"{comment.Text}\", Author: \"{comment.CommenterName}\", Date: \"{comment.CommentedDate}\"}})-[:CommentedOn]->(p),(u)-[:Comment]->(c)" +
+                           $"CREATE (c:Comment {{Text: \"{comment.Text}\", CommenterName: \"{comment.CommenterName}\", CommentedDate: \"{comment.CommentedDate}\"}})-[:CommentedOn]->(p),(u)-[:Comment]->(c)" +
                            $"RETURN *";
             try
             {
@@ -233,7 +233,7 @@ namespace DAL.Databases
                 Dispose();
                 return ResponseEnum.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Dispose();
                 return ResponseEnum.Failed;
@@ -251,10 +251,8 @@ namespace DAL.Databases
         /// <returns> If the block user action was a without error will send "ok" to the client </returns>
         public ResponseEnum BlockUser(string userName, string blockedUserName)
         {
-            var statment = $"MATCH (u:User)" +
-               $"WHERE u.Username = \"{userName}\"" +
-               $"MATCH (bu:User)" +
-               $"WHERE bu.Username = \"{blockedUserName}\"" +
+            var statment = $"MATCH (u:User),(bu:User)" +
+               $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{blockedUserName}\"" +
                $"MERGE (u)-[:Block]->(bu)" +
                $"RETURN *";
 
@@ -312,10 +310,8 @@ namespace DAL.Databases
         /// <returns> If the follow user action was a without error will send "ok" to the client </returns>
         public ResponseEnum FollowUser(string userName, string UserToFollow)
         {
-            var statment = $"MATCH (u:User)" +
-               $"WHERE u.Username = \"{userName}\"" +
-               $"MATCH (bu:User)" +
-               $"WHERE bu.Username = \"{UserToFollow}\"" +
+            var statment = $"MATCH (u:User),(bu:User)" +
+               $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{UserToFollow}\"" +
                $"MERGE (u)-[:Follow]->(bu)" +
                $"RETURN *";
 
