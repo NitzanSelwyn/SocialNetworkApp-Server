@@ -19,8 +19,7 @@ namespace DAL.Databases
 
         public Neo4jDB(string uri, string user, string password)
         {
-            _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
-           
+            _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));      
         }
 
         public void Dispose()
@@ -443,8 +442,7 @@ namespace DAL.Databases
                 {
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                     commentList.Add(JsonConvert.DeserializeObject<Comment>(nodeProps));
-                }
-     
+                } 
             }
             Dispose();
             return commentList;

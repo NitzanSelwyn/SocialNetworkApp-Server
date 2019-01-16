@@ -24,26 +24,23 @@ namespace AuthService
         }
         public bool IsTokenValid(string token)
         {
-            if(token==null||string.IsNullOrWhiteSpace(token))
-            //checks if the token is valid
-            if (TokenExists(token))
-            {
-                if (TokenIsActive(TokensCollection[token].LastUsed))
+            if (token == null || string.IsNullOrWhiteSpace(token))
+                //checks if the token is valid
+                if (TokenExists(token))
                 {
-                    UpdateTokenOnUse(token);
-                    return true;
+                    if (TokenIsActive(TokensCollection[token].LastUsed))
+                    {
+                        UpdateTokenOnUse(token);
+                        return true;
+                    }
                 }
-            }
             return false;
         }
 
         private void UpdateTokenOnUse(string token)
         {
             //updates the token's last used
-            if (token != null)
-            {
-                TokensCollection[token].LastUsed = DateTime.Now;
-            }
+            TokensCollection[token].LastUsed = DateTime.Now;
         }
 
         private bool TokenExists(string token)
