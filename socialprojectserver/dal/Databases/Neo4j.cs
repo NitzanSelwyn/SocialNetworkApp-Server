@@ -453,7 +453,7 @@ namespace DAL.Databases
 
             var statment = $"MATCH (u:User)-[:Liked]->(p:Post)" +
                            $"WHERE p.PostId = \"{postId}\"" +
-                           $"RETURN p";
+                           $"RETURN u";
 
             using (var session = _driver.Session())
             {
