@@ -25,15 +25,18 @@ namespace AuthService
         public bool IsTokenValid(string token)
         {
             if (token == null || string.IsNullOrWhiteSpace(token))
-                //checks if the token is valid
-                if (TokenExists(token))
+            {
+                return false;
+            }
+            //checks if the token is valid
+            else if (TokenExists(token))
+            {
+                if (TokenIsActive(TokensCollection[token].LastUsed))
                 {
-                    if (TokenIsActive(TokensCollection[token].LastUsed))
-                    {
-                        UpdateTokenOnUse(token);
-                        return true;
-                    }
+                    UpdateTokenOnUse(token);
+                    return true;
                 }
+            }
             return false;
         }
 
