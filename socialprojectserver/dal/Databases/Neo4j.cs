@@ -70,7 +70,7 @@ namespace DAL.Databases
         {
             List<Post> postList = new List<Post>();
 
-            var statment = $"MATCH (u:User)-[:Posted]->(p:Post),(u)-[:Liked]->(p)" +
+            var statment = $"MATCH (u:User)-[:Posted]->(p:Post)" +
                            $"WHERE u.Username = \"{userName}\"" +
                            $"RETURN p ORDER BY p.DatePosted DESC";
 
@@ -191,6 +191,28 @@ namespace DAL.Databases
                            $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
                            $"MERGE (u)-[:Liked]->(p)" +
                            $"RETURN *";
+            try
+            {
+
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment).Consume();
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        public ResponseEnum UnLikePost(Like like)
+        {
+            var statment = $"MATCH (u:User)-[l:Liked]->(p:Post)" +
+                           $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
+                           $"DELETE l";
             try
             {
 

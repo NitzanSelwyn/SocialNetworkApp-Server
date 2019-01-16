@@ -144,5 +144,12 @@ namespace BL.Managers
 
         }
 
+        public ResponseEnum UnLikePost(Like like)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+                return graphContext.UnLikePost(like);
+            }
+        }
     }
 }

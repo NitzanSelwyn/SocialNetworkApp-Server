@@ -23,6 +23,7 @@ namespace Common.Configs
         public const string EditPost = "Api/Post/edit";
         public const string DeletePost = "Api/Post";
         public const string Like = "Api/Like";
+        public const string UnLike = "Api/UnLike";
         public const string GetUsersWhoLiked = "Api/UsersWhoLiked";
         public const string CommentOnPost = "Api/Comment";
         public const string GetPostsComments = "Api/GetPostsComments";

@@ -15,6 +15,7 @@ namespace Common.Contracts.Managers
         List<Post> GetFolowersPosts(string userName);
         ResponseEnum DeletePost(string postId);
         ResponseEnum LikePost(Like like);
+        ResponseEnum UnLikePost(Like like);
         ResponseEnum CommentOnPos(Comment comment);
         List<Comment> GetPostsComments(string postId);
         ResponseEnum RegisterUserToNeo4j(string userName);

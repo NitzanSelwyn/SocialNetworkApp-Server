@@ -91,6 +91,21 @@ namespace SocialProjectServer.Controllers
         }
 
         [HttpPost]
+        [Route(RouteConfigs.UnLike)]
+        public IHttpActionResult UnLikePost([FromBody]Like like)
+        {
+            ResponseEnum response = postManager.UnLikePost(like);
+            if (response == ResponseEnum.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
+
+        [HttpPost]
         [Route(RouteConfigs.CommentOnPost)]
         public IHttpActionResult CommentOnPost([FromBody]Comment comment)
         {
