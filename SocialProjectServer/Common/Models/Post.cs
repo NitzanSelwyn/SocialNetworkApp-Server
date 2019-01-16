@@ -27,6 +27,11 @@ namespace Common.Models
 
         public Like Like { get; set; }
 
+        public Post()
+        {
+            Like = new Like();
+        }
+
 
 
     }

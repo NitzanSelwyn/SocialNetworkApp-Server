@@ -70,7 +70,7 @@ namespace DAL.Databases
         {
             List<Post> postList = new List<Post>();
 
-            var statment = $"MATCH (u:User)-[:Posted]->(p:Post)" +
+            var statment = $"MATCH (u:User)-[:Posted]->(p:Post),(u)-[:Liked]->(p)" +
                            $"WHERE u.Username = \"{userName}\"" +
                            $"RETURN p ORDER BY p.DatePosted DESC";
 
@@ -81,7 +81,9 @@ namespace DAL.Databases
                 foreach (var result in results)
                 {
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    postList.Add(JsonConvert.DeserializeObject<Post>(nodeProps));
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    postList.Add(post);
                 }
 
                 return postList;
@@ -111,7 +113,9 @@ namespace DAL.Databases
                 foreach (var result in results)
                 {
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    postList.Add(JsonConvert.DeserializeObject<Post>(nodeProps));
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    postList.Add(post);
                 }
 
                 return postList;
@@ -183,10 +187,9 @@ namespace DAL.Databases
         /// <returns> If the like was a without error will send "ok" to the client </returns>
         public ResponseEnum LikePost(Like like)
         {
-            var statment = $"MATCH (p:Post)" +
-                           $"WHERE p.postId = \"{like.postId}\"" +
-                           $"MERGE (u:User)-[:Liked]->(p)" +
-                           $"WHERE u.Username = \"{like.UserName}\"" +
+            var statment = $"MATCH (p:Post),(u:User)" +
+                           $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
+                           $"MERGE (u)-[:Liked]->(p)" +
                            $"RETURN *";
             try
             {
@@ -439,10 +442,32 @@ namespace DAL.Databases
                 {
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                     commentList.Add(JsonConvert.DeserializeObject<Comment>(nodeProps));
+                } 
+            }
+            
+            return commentList;
+        }
+
+        private List<string> GetUsersWhoLikedThePost(string postId)
+        {
+            var usernameList = new List<string>();
+
+            var statment = $"MATCH (u:User)-[:Liked]->(p:Post)" +
+                           $"WHERE p.PostId = \"{postId}\"" +
+                           $"RETURN p";
+
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usernameList.Add(user.Username);
                 }
             }
-
-            return commentList;
+            return usernameList;
         }
     }
 }

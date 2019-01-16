@@ -13,7 +13,12 @@ namespace Common.Models
 
         public string postId { get; set; }
 
-        public List<User> UsersWhoLiked { get; set; }
+        public List<string> UsersWhoLiked { get; set; }
+
+        public Like()
+        {
+            UsersWhoLiked = new List<string>();
+        }
 
     }
 }
