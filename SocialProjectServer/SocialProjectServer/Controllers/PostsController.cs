@@ -24,6 +24,7 @@ namespace SocialProjectServer.Controllers
     public class PostsController : ApiController
     {
         IPostManager postManager { get; set; }
+
         public PostsController()
         {
             postManager = ServerContainer.container.GetInstance<IPostManager>();
