@@ -219,9 +219,15 @@ namespace DAL.Repostiories
 
         public string GetLastPostIdAndUpdate()
         {
-            //var table = networkDb.GetPostTable;
-            //return table["LastPostId"].AsString();
-            return "";
+            //gets  the last post id and updates the prop
+            var table = networkDb.GetConfigsTable();
+            Document idDoc = table.GetItem("LastPostId");
+            var lastId = idDoc["Value"];
+            int id = Convert.ToInt32(lastId);
+            id++;
+            idDoc["Value"] = id.ToString();
+            table.PutItem(idDoc);
+            return id.ToString();
         }
     }
 }
