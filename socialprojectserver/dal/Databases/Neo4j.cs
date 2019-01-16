@@ -20,7 +20,7 @@ namespace DAL.Databases
         public Neo4jDB(string uri, string user, string password)
         {
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
-
+           
         }
 
         public void Dispose()
@@ -41,7 +41,7 @@ namespace DAL.Databases
 
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\", DatePosted: \"{post.DatePosted}\"}})" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\", DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
             try
@@ -220,13 +220,10 @@ namespace DAL.Databases
         /// <returns> If the new comment action was a without error will send "ok" to the client </returns>
         public ResponseEnum CommentOnPost(Comment comment)
         {
-            var statment = $"MATCH (p:Post)" +
-                           $"WHERE p.postId = \"{comment.postId}\"" +
-                           $"CREATE (c:Comment {{Content: \"{comment.Text}\", Author: \"{comment.CommenterName}\", Date: {comment.CommentedDate}}})-[:CommentedOn]->(p)" +
-                           $"WHERE u.Username = \"{comment.CommenterName}\"" +
-                           $"CREATE (u)-[:Comment]->(c)" +
+            var statment = $"MATCH (p:Post),(u:User)" +
+                           $"WHERE p.PostId = \"{comment.postId}\" AND u.Username = \"{comment.CommenterName}\"" +
+                           $"CREATE (c:Comment {{Content: \"{comment.Text}\", Author: \"{comment.CommenterName}\", Date: \"{comment.CommentedDate}\"}})-[:CommentedOn]->(p),(u)-[:Comment]->(c)" +
                            $"RETURN *";
-
             try
             {
                 using (var session = _driver.Session())
@@ -236,7 +233,7 @@ namespace DAL.Databases
                 Dispose();
                 return ResponseEnum.Succeeded;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Dispose();
                 return ResponseEnum.Failed;
