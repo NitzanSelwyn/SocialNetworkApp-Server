@@ -23,6 +23,11 @@ namespace Common.Models
 
         public string FullName { get; set; }
 
+        public DateTime DatePosted { get; set; }
+
+        public Like Like { get; set; }
+
+
 
     }
 }

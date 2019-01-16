@@ -16,6 +16,7 @@ namespace SocialProjectServer.Services
         {
 
         }
+
         public HttpClient client { get; set; }
 
         public Tuple<object, HttpStatusCode> GetRequest(string route)
@@ -54,6 +55,7 @@ namespace SocialProjectServer.Services
                 }
             }
         }
+
         public void InitHttpClient()
         {
             client.BaseAddress = new Uri(MainConfigs.AuthServiceUrl);

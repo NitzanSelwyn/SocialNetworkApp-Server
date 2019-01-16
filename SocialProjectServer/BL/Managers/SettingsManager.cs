@@ -15,6 +15,7 @@ namespace BL.Managers
     public class SettingsManager : ISettingsManager
     {
         public INetworkRepository repository { get; set; }
+
         public SettingsManager(INetworkRepository repository)
         {
             this.repository = repository;
