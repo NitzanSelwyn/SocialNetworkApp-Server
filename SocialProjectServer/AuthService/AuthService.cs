@@ -40,7 +40,10 @@ namespace AuthService
         private void UpdateTokenOnUse(string token)
         {
             //updates the token's last used
-            TokensCollection[token].LastUsed = DateTime.Now;
+            if (token != null)
+            {
+                TokensCollection[token].LastUsed = DateTime.Now;
+            }
         }
 
         private bool TokenExists(string token)
