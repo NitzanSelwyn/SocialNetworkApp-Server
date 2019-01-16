@@ -66,10 +66,6 @@ namespace BL.Managers
             else
             {
                 UserRegister userRegister = new UserRegister(user.Username, user.Firstname, user.Lastname);
-                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-                {
-                    graphContext.RegisterUserToNeo4j(userRegister.Username);
-                }
                 return TryRegister(userRegister);
             }
         }
@@ -83,7 +79,7 @@ namespace BL.Managers
         {
             using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
-                return graphContext.GetBlockedUsers(myId).Contains(userToViewId)||graphContext.GetBlockedUsers(userToViewId).Contains(myId);
+                return graphContext.GetBlockedUsers(myId).Contains(userToViewId) || graphContext.GetBlockedUsers(userToViewId).Contains(myId);
             }
         }
     }

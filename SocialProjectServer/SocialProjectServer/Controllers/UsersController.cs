@@ -155,5 +155,20 @@ namespace SocialProjectServer.Controllers
             List<User> users = usersManager.SearchForUsers(input);
             return Ok(users);
         }
+        [HttpPost]
+        [Route(RouteConfigs.GetUserByUsername)]
+        public IHttpActionResult GetUserByUsername([FromBody]string username)
+        {
+            //returs the user that matches this username
+            User user = usersManager.GetUserById(username);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
     }
 }
