@@ -19,7 +19,8 @@ namespace DAL.Databases
 
         public Neo4jDB(string uri, string user, string password)
         {
-            _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));      
+            _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
+
         }
 
         public void Dispose()
@@ -50,11 +51,11 @@ namespace DAL.Databases
                     var results = session.Run(statment).Consume();
                 }
 
-                               return ResponseEnum.Succeeded;
+                return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -84,7 +85,7 @@ namespace DAL.Databases
                     post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
                     postList.Add(post);
                 }
-                
+
                 return postList;
             }
         }
@@ -116,7 +117,7 @@ namespace DAL.Databases
                     post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
                     postList.Add(post);
                 }
-              
+
                 return postList;
             }
         }
@@ -141,12 +142,12 @@ namespace DAL.Databases
                     var results = session.Run(statment).Consume();
                 }
 
-               
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-              
+
                 return ResponseEnum.Failed;
             }
         }
@@ -167,12 +168,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment).Consume();
                 }
-              
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -197,12 +198,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment).Consume();
                 }
-               
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -228,12 +229,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment).Consume();
                 }
-                
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -260,12 +261,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-               
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -289,12 +290,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-               
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -319,12 +320,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-               
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-               
+
                 return ResponseEnum.Failed;
             }
         }
@@ -348,12 +349,12 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
                 }
-              
+
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
             {
-              
+
                 return ResponseEnum.Failed;
             }
         }
@@ -380,10 +381,11 @@ namespace DAL.Databases
                 foreach (var result in results)
                 {
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
-                }       
+                    User user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usertList.Add(user.Username);
+                }
             }
-            
+
             return usertList;
         }
 
@@ -410,11 +412,10 @@ namespace DAL.Databases
                 foreach (var result in results)
                 {
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    usertList.Add(JsonConvert.DeserializeObject<string>(nodeProps));
+                    User user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usertList.Add(user.Username);
                 }
             }
-           
-
             return usertList;
         }
 
