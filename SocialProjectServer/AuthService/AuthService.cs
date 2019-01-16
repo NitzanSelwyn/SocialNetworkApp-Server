@@ -24,6 +24,7 @@ namespace AuthService
         }
         public bool IsTokenValid(string token)
         {
+            if(token==null||string.IsNullOrWhiteSpace(token))
             //checks if the token is valid
             if (TokenExists(token))
             {
