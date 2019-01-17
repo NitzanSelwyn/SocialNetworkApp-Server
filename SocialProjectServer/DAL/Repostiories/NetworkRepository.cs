@@ -150,6 +150,10 @@ namespace DAL.Repostiories
                 networkDb.GetUsersTable().PutItem(existingUser);
                 User userEdited = GetUserById(user.Username);
                 Users[userEdited.Username] = userEdited;
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    graphContext.UpdateUserDetails(userEdited.Username, $"{userEdited.FirstName} {userEdited.LastName}");
+                }
                 return userEdited;
             }
             catch (Exception)

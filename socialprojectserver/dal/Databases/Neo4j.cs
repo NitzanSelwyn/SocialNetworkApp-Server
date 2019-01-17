@@ -38,10 +38,9 @@ namespace DAL.Databases
         /// <returns> If the upload was a without error will send "ok" to the client </returns>
         public ResponseEnum UploadPost(Post post)
         {
-
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\", DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
                            $"CREATE (u)-[:Posted]->(p)" +
                            $"RETURN *";
             try
@@ -83,6 +82,7 @@ namespace DAL.Databases
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                     var post = JsonConvert.DeserializeObject<Post>(nodeProps);
                     post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    post.FullName = GetUserName(post.Author);
                     postList.Add(post);
                 }
 
@@ -103,7 +103,7 @@ namespace DAL.Databases
 
             var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
                            $"WHERE u.Username = \"{userName}\" AND " +
-                           $"NOT EXISTS ((u)-[:Blocked]-(u2))" +
+                           $"NOT EXISTS ((u)-[:Block]-(u2))" +
                            $"RETURN p ORDER BY p.DatePosted DESC";
 
             using (var session = _driver.Session())
@@ -115,6 +115,7 @@ namespace DAL.Databases
                     var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                     var post = JsonConvert.DeserializeObject<Post>(nodeProps);
                     post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    post.FullName = GetUserName(post.Author);
                     postList.Add(post);
                 }
 
@@ -526,6 +527,54 @@ namespace DAL.Databases
                 }
             }
             return usernameList;
+        }
+
+        public ResponseEnum UpdateUserDetails(string userName, string newFullName)
+        {
+            var statment = $"MERGE  (u:User {{Username: \"{userName}\"}})" +
+                           $"SET u.FullName = \"{newFullName}\"" +
+                           $"RETURN *";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        private string GetUserName(string userNamne)
+        {
+            var statment = $"MATCH (u:User)" +
+                           $"WHERE u.Username = \"{userNamne}\"" +
+                           $"RETURN u.FullName";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        return JsonConvert.DeserializeObject<string>(nodeProps);                      
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }
