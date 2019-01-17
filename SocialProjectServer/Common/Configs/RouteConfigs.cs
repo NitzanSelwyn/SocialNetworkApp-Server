@@ -27,6 +27,8 @@ namespace Common.Configs
         public const string GetUsersWhoLiked = "Api/UsersWhoLiked";
         public const string CommentOnPost = "Api/Comment";
         public const string GetPostsComments = "Api/GetPostsComments";
+        public const string GetTheUsersThatIFollow = "Api/GetTheUsersThatIFollow";
+        public const string GetTheUserThatFollowMe = "Api/GetTheUserThatFollowMe";
 
 
 

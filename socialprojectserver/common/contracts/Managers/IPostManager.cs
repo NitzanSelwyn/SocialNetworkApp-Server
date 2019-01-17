@@ -17,6 +17,8 @@ namespace Common.Contracts.Managers
         ResponseEnum LikePost(Like like);
         ResponseEnum UnLikePost(Like like);
         ResponseEnum CommentOnPos(Comment comment);
+        List<string> GetTheUserThatFollowMe(string userName);
+        List<string> GetTheUsersThatIFollow(string userName);
         List<Comment> GetPostsComments(string postId);
         ResponseEnum RegisterUserToNeo4j(string userName);
         string UploadFile(byte[] file, string authorName);

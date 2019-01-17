@@ -151,5 +151,21 @@ namespace BL.Managers
                 return graphContext.UnLikePost(like);
             }
         }
+
+        public List<string> GetTheUserThatFollowMe(string userName)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+                return graphContext.GetTheUserThatFollowMe(userName);
+            }
+        }
+
+        public List<string> GetTheUsersThatIFollow(string userName)
+        {
+            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
+            {
+                return graphContext.GetTheUsersThatIFollow(userName);
+            }
+        }
     }
 }

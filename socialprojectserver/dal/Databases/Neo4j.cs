@@ -208,6 +208,13 @@ namespace DAL.Databases
             }
         }
 
+        /// <summary>
+        /// When a user as liked a post and wants to unlike a new button will apper on the post
+        /// that he likes that allows him to unlike.
+        /// by only removing the connection of "Liked" this operation works
+        /// </summary>
+        /// <param name="like"></param>
+        /// <returns> If the Unlike was a without error will send "ok" to the client </returns>
         public ResponseEnum UnLikePost(Like like)
         {
             var statment = $"MATCH (u:User)-[l:Liked]->(p:Post)" +
@@ -419,13 +426,35 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="userName"></param>
         /// <returns> List of all the Following users of a specific user </returns>
-        public List<string> GetFollowingUsers(string userName)
+        public List<string> GetTheUsersThatIFollow(string userName)
         {
             List<string> usertList = new List<string>();
 
             var statment = $"MATCH (u:User)-[:Follow]->(fu:User)" +
                            $"WHERE u.Username = \"{userName}\"" +
                            $"RETURN fu";
+
+            using (var session = _driver.Session())
+            {
+                var results = session.Run(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    User user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usertList.Add(user.Username);
+                }
+            }
+            return usertList;
+        }
+
+        public List<string> GetTheUserThatFollowMe(string userName)
+        {
+            List<string> usertList = new List<string>();
+
+            var statment = $"MATCH (u:User)-[:Follow]->(fu:User)" +
+                           $"WHERE fu.Username = \"{userName}\"" +
+                           $"RETURN u";
 
             using (var session = _driver.Session())
             {
@@ -470,6 +499,13 @@ namespace DAL.Databases
             return commentList;
         }
 
+        /// <summary>
+        /// When the user request a the posts of his following/enters a profile of a single usser
+        /// he recived a List of post so becuse we want to show how many likes and who liked the post
+        /// every post id that was found will come to this function and return the username list of that post
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <returns> List of all the usernames who liked a post</returns>
         private List<string> GetUsersWhoLikedThePost(string postId)
         {
             var usernameList = new List<string>();
