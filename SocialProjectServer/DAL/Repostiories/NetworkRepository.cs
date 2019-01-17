@@ -124,12 +124,12 @@ namespace DAL.Repostiories
                 Users.Add(user.Username, user);
                 using (Neo4jDB db = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
                 {
-                    db.RegisterUserToNeo4j(userRegister.Username);
+                    db.RegisterUserToNeo4j(userRegister.Username,userRegister.FirstName, userRegister.LastName);
                 }
 
                 return user;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -152,7 +152,7 @@ namespace DAL.Repostiories
                 Users[userEdited.Username] = userEdited;
                 using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
                 {
-                    graphContext.UpdateUserDetails(userEdited.Username, $"{userEdited.FirstName} {userEdited.LastName}");
+                    graphContext.UpdateUserDetails(userEdited.Username, userEdited.FirstName ,userEdited.LastName);
                 }
                 return userEdited;
             }

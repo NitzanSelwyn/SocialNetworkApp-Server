@@ -20,7 +20,7 @@ namespace Common.Contracts.Managers
         //List<string> GetTheUserThatFollowMe(string userName);
         //List<string> GetTheUsersThatIFollow(string userName);
         List<Comment> GetPostsComments(string postId);
-        ResponseEnum RegisterUserToNeo4j(string userName);
+        ResponseEnum RegisterUserToNeo4j(string userName, string firstName,string lastName);
         string UploadFile(byte[] file, string authorName);
     }
 }

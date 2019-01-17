@@ -159,9 +159,9 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="userName"></param>
         /// <returns> If the RegisterUser was a without error will send "ok" to the client </returns>
-        public ResponseEnum RegisterUserToNeo4j(string userName)
+        public ResponseEnum RegisterUserToNeo4j(string userName, string firstName, string lastName)
         {
-            var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
+            var statment = $"CREATE (u:User {{Username: \"{userName}\", FirstName: \"{firstName}\", LastName: \"{lastName}\"}})";
 
             try
             {
@@ -529,10 +529,10 @@ namespace DAL.Databases
             return usernameList;
         }
 
-        public ResponseEnum UpdateUserDetails(string userName, string newFullName)
+        public ResponseEnum UpdateUserDetails(string userName, string firstName, string lastName)
         {
-            var statment = $"MERGE  (u:User {{Username: \"{userName}\"}})" +
-                           $"SET u.FullName = \"{newFullName}\"" +
+            var statment = $"MERGE (u:User {{Username: \"{userName}\"}})" +
+                           $"SET u.FirstName = \"{firstName}\",u.LastName = \"{lastName}\"" +
                            $"RETURN *";
 
             try
@@ -544,7 +544,7 @@ namespace DAL.Databases
 
                 return ResponseEnum.Succeeded;
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
                 return ResponseEnum.Failed;
@@ -555,7 +555,7 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{userNamne}\"" +
-                           $"RETURN u.FullName";
+                           $"RETURN u";
 
             try
             {
@@ -565,7 +565,8 @@ namespace DAL.Databases
                     foreach (var result in results)
                     {
                         var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        return JsonConvert.DeserializeObject<string>(nodeProps);                      
+                        var user = JsonConvert.DeserializeObject<User>(nodeProps);
+                        return $"{user.FirstName} {user.LastName}";
                     }
                 }
 

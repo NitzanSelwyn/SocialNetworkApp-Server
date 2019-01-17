@@ -45,11 +45,11 @@ namespace BL.Managers
             }
         }
 
-        public ResponseEnum RegisterUserToNeo4j(string userName)
+        public ResponseEnum RegisterUserToNeo4j(string userName, string firstName,string lastName)
         {
             using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
             {
-                return graphContext.RegisterUserToNeo4j(userName);
+                return graphContext.RegisterUserToNeo4j(userName, firstName,lastName);
             }
         }
 
