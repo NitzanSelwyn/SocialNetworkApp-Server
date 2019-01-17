@@ -27,10 +27,6 @@ namespace Common.Configs
         public const string GetUsersWhoLiked = "Api/UsersWhoLiked";
         public const string CommentOnPost = "Api/Comment";
         public const string GetPostsComments = "Api/GetPostsComments";
-        public const string GetTheUsersThatIFollow = "Api/GetTheUsersThatIFollow";
-        public const string GetTheUserThatFollowMe = "Api/GetTheUserThatFollowMe";
-
-
 
         //USERS
         public const string GetMyUserRoute = "Api/users/GetUserByToken";
@@ -41,7 +37,8 @@ namespace Common.Configs
         public const string SearchUsersRoute = "Api/Users/SearchForUsers";
         public const string BlockedByUsersRoute = "Api/Users/BlockedByUser";
         public const string GetUserByUsername = "Api/Users/GetUserByUsername";
-
+        public const string GetTheUsersThatIFollow = "Api/GetTheUsersThatIFollow";
+        public const string GetTheUserThatFollowMe = "Api/GetTheUserThatFollowMe";
         public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
 
         //SETTINGS

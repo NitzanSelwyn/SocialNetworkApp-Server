@@ -21,6 +21,7 @@ namespace Common.Contracts
         ResponseEnum UnFollowUser(string userId, string onUserId);
         List<UserRepresentation> GetBlockedUsers(string userId);
         List<UserRepresentation> GetFollowingUsers(string userId);
+        List<UserRepresentation> GetUsersThatFollowMe(string userId);
         Document GetUserDocById(string id);
         User EditUserDetails(User user);
         ResponseEnum EditPassword(EditPassword editPassword);

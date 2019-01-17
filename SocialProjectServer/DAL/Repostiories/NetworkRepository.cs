@@ -177,7 +177,19 @@ namespace DAL.Repostiories
 
             using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
             {
-                userNames = graphContext.GetFollowingUsers(userId);
+                userNames = graphContext.GetTheUsersThatIFollow(userId);
+            }
+
+            return GetUserRepresentations(userNames);
+        }
+
+        public List<UserRepresentation> GetUsersThatFollowMe(string userId)
+        {
+            List<string> userNames = new List<string>();
+
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+            {
+                userNames = graphContext.GetTheUserThatFollowMe(userId);
             }
 
             return GetUserRepresentations(userNames);
