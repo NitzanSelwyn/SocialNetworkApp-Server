@@ -1,4 +1,4 @@
-﻿using Amazon.DynamoDBv2.DocumentModel;
+﻿
 using Common.Configs;
 using Common.Contracts;
 using Common.Enums;
