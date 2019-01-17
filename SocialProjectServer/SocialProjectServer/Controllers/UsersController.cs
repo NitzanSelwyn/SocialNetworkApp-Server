@@ -172,5 +172,19 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
+        //[HttpPost]
+        //[Route(RouteConfigs.GetTheUsersThatIFollow)]
+        //public List<string> GetTheUsersThatIFollow([FromBody]string userName)
+        //{
+        //    return usersManager.GetTheUsersThatIFollow(userName);
+        //}
+
+        //[HttpPost]
+        //[Route(RouteConfigs.GetTheUserThatFollowMe)]
+        //public List<string> GetTheUserThatFollowMe([FromBody]string userName)
+        //{
+        //    return usersManager.GetTheUserThatFollowMe(userName);
+        //}
     }
 }

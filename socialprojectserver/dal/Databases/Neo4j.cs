@@ -38,19 +38,17 @@ namespace DAL.Databases
         /// <returns> If the upload was a without error will send "ok" to the client </returns>
         public ResponseEnum UploadPost(Post post)
         {
-            lock (Neo4jLock)
+            var statment = $"MATCH (u:User)" +
+                           $"WHERE u.Username = \"{post.Author}\"" +
+                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
+                           $"CREATE (u)-[:Posted]->(p)" +
+                           $"RETURN *";
+            try
             {
-                var statment = $"MATCH (u:User)" +
-$"WHERE u.Username = \"{post.Author}\"" +
-$"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", FullName: \"{post.FullName}\", DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
-$"CREATE (u)-[:Posted]->(p)" +
-$"RETURN *";
-                try
+                using (var session = _driver.Session())
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment).Consume();
-                    }
+                    var results = session.Run(statment).Consume();
+                }
 
                     return ResponseEnum.Succeeded;
                 }
@@ -82,13 +80,14 @@ $"RETURN *";
                 {
                     var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
-                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
-                        postList.Add(post);
-                    }
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    post.FullName = GetUserName(post.Author);
+                    postList.Add(post);
+                }
 
                     return postList;
                 }
@@ -108,22 +107,23 @@ $"RETURN *";
             {
                 List<Post> postList = new List<Post>();
 
-                var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
-                               $"WHERE u.Username = \"{userName}\" AND " +
-                               $"NOT EXISTS ((u)-[:Blocked]-(u2))" +
-                               $"RETURN p ORDER BY p.DatePosted DESC";
+            var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
+                           $"WHERE u.Username = \"{userName}\" AND " +
+                           $"NOT EXISTS ((u)-[:Block]-(u2))" +
+                           $"RETURN p ORDER BY p.DatePosted DESC";
 
                 using (var session = _driver.Session())
                 {
                     var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
-                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
-                        postList.Add(post);
-                    }
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    post.FullName = GetUserName(post.Author);
+                    postList.Add(post);
+                }
 
                     return postList;
                 }
@@ -169,11 +169,9 @@ $"RETURN *";
         /// </summary>
         /// <param name="userName"></param>
         /// <returns> If the RegisterUser was a without error will send "ok" to the client </returns>
-        public ResponseEnum RegisterUserToNeo4j(string userName)
+        public ResponseEnum RegisterUserToNeo4j(string userName, string firstName, string lastName)
         {
-            lock (Neo4jLock)
-            {
-                var statment = $"CREATE (u:User {{Username: \"{userName}\"}})";
+            var statment = $"CREATE (u:User {{Username: \"{userName}\", FirstName: \"{firstName}\", LastName: \"{lastName}\"}})";
 
                 try
                 {
@@ -566,14 +564,62 @@ $"RETURN *";
                 {
                     var results = session.Run(statment);
 
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usernameList.Add(user.Username);
+                }
+            }
+            return usernameList;
+        }
+
+        public ResponseEnum UpdateUserDetails(string userName, string firstName, string lastName)
+        {
+            var statment = $"MERGE (u:User {{Username: \"{userName}\"}})" +
+                           $"SET u.FirstName = \"{firstName}\",u.LastName = \"{lastName}\"" +
+                           $"RETURN *";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
+                }
+
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception e)
+            {
+
+                return ResponseEnum.Failed;
+            }
+        }
+
+        private string GetUserName(string userNamne)
+        {
+            var statment = $"MATCH (u:User)" +
+                           $"WHERE u.Username = \"{userNamne}\"" +
+                           $"RETURN u";
+
+            try
+            {
+                using (var session = _driver.Session())
+                {
+                    var results = session.Run(statment);
                     foreach (var result in results)
                     {
                         var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
                         var user = JsonConvert.DeserializeObject<User>(nodeProps);
-                        usernameList.Add(user.Username);
+                        return $"{user.FirstName} {user.LastName}";
                     }
                 }
-                return usernameList;
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

@@ -133,60 +133,58 @@ namespace DAL.Repostiories
 
         public User RegisterUser(UserRegister userRegister)
         {
-            lock (NetDbLock)
+            //registers the users
+            try
             {
-                //registers the users
-                try
+                Document newUser = new Document();
+                newUser[DatabaseConfigs.UsersKey] = userRegister.Username.ToLower();
+                newUser["FirstName"] = userRegister.FirstName.ToLower();
+                newUser["LastName"] = userRegister.LastName.ToLower();
+                newUser["Password"] = userRegister.Password;
+                newUser["BirthDate"] = userRegister.BirthDate;
+                newUser["Email"] = userRegister.Email;
+                newUser["Address"] = userRegister.Address.ToLower();
+                newUser["WorkLocation"] = userRegister.WorkLocation.ToLower();
+                networkDb.GetUsersTable().PutItem(newUser);
+                User user = GetUserById(userRegister.Username);
+                Users.Add(user.Username, user);
+                using (Neo4jDB db = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
                 {
-                    Document newUser = new Document();
-                    newUser[DatabaseConfigs.UsersKey] = userRegister.Username.ToLower();
-                    newUser["FirstName"] = userRegister.FirstName.ToLower();
-                    newUser["LastName"] = userRegister.LastName.ToLower();
-                    newUser["Password"] = userRegister.Password;
-                    newUser["BirthDate"] = userRegister.BirthDate;
-                    newUser["Email"] = userRegister.Email;
-                    newUser["Address"] = userRegister.Address.ToLower();
-                    newUser["WorkLocation"] = userRegister.WorkLocation.ToLower();
-                    networkDb.GetUsersTable().PutItem(newUser);
-                    User user = GetUserById(userRegister.Username);
-                    Users.Add(user.Username, user);
-                    using (Neo4jDB db = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-                    {
-                        db.RegisterUserToNeo4j(userRegister.Username);
-                    }
+                    db.RegisterUserToNeo4j(userRegister.Username,userRegister.FirstName, userRegister.LastName);
+                }
 
-                    return user;
-                }
-                catch (Exception e)
-                {
-                    return null;
-                }
+                return user;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 
         public User EditUserDetails(User user)
         {
-            lock (NetDbLock)
+            //registers the users
+            try
             {
-                //registers the users
-                try
+                Document existingUser = GetUserDocById(user.Username);
+                existingUser["FirstName"] = user.FirstName.ToLower();
+                existingUser["LastName"] = user.LastName.ToLower();
+                existingUser["BirthDate"] = user.BirthDate;
+                existingUser["Email"] = user.Email;
+                existingUser["Address"] = user.Address.ToLower();
+                existingUser["WorkLocation"] = user.WorkLocation.ToLower();
+                networkDb.GetUsersTable().PutItem(existingUser);
+                User userEdited = GetUserById(user.Username);
+                Users[userEdited.Username] = userEdited;
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
                 {
-                    Document existingUser = GetUserDocById(user.Username);
-                    existingUser["FirstName"] = user.FirstName.ToLower();
-                    existingUser["LastName"] = user.LastName.ToLower();
-                    existingUser["BirthDate"] = user.BirthDate;
-                    existingUser["Email"] = user.Email;
-                    existingUser["Address"] = user.Address.ToLower();
-                    existingUser["WorkLocation"] = user.WorkLocation.ToLower();
-                    networkDb.GetUsersTable().PutItem(existingUser);
-                    User userEdited = GetUserById(user.Username);
-                    Users[userEdited.Username] = userEdited;
-                    return userEdited;
+                    graphContext.UpdateUserDetails(userEdited.Username, userEdited.FirstName ,userEdited.LastName);
                 }
-                catch (Exception)
-                {
-                    return null;
-                }
+                return userEdited;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 
@@ -206,14 +204,24 @@ namespace DAL.Repostiories
 
         public List<UserRepresentation> GetFollowingUsers(string userId)
         {
-            lock (NetDbLock)
-            {
-                List<string> userNames = new List<string>();
+            List<string> userNames = new List<string>();
 
-                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-                {
-                    userNames = graphContext.GetTheUsersThatIFollow(userId);
-                }
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+            {
+                userNames = graphContext.GetTheUsersThatIFollow(userId);
+            }
+
+            return GetUserRepresentations(userNames);
+        }
+
+        public List<UserRepresentation> GetUsersThatFollowMe(string userId)
+        {
+            List<string> userNames = new List<string>();
+
+            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+            {
+                userNames = graphContext.GetTheUserThatFollowMe(userId);
+            }
 
                 return GetUserRepresentations(userNames);
             }

@@ -127,19 +127,7 @@ namespace SocialProjectServer.Controllers
             return postManager.GetPostsComments(postId);
         }
 
-        [HttpPost]
-        [Route(RouteConfigs.GetTheUsersThatIFollow)]
-        public List<string> GetTheUsersThatIFollow([FromBody]string userName)
-        {
-            return postManager.GetTheUsersThatIFollow(userName);
-        }
 
-        [HttpPost]
-        [Route(RouteConfigs.GetTheUserThatFollowMe)]
-        public List<string> GetTheUserThatFollowMe([FromBody]string userName)
-        {
-            return postManager.GetTheUserThatFollowMe(userName);
-        }
     }
 }
 
