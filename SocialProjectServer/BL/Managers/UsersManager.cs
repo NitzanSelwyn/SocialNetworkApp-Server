@@ -17,10 +17,15 @@ namespace BL.Managers
     public class UsersManager : IUsersManager
     {
         public INetworkRepository repository { get; set; }
+        private Neo4jDB neo4JDB;
+
         public UsersManager(INetworkRepository repository)
         {
             this.repository = repository;
+            neo4JDB = new Neo4jDB();
+
         }
+
         public User GetUserById(string id)
         {
             //returns the user that matches this id
@@ -40,16 +45,19 @@ namespace BL.Managers
             }
             return user;
         }
+
         public User EditUserDetails(User user)
         {
             //tries to edit the user details
             return repository.EditUserDetails(user);
         }
+
         public bool IsUsernameExists(string userName)
         {
             //checks if the username exists
             return repository.GetUserById(userName.ToLower()) != null;
         }
+
         public User TryRegister(UserRegister userRegister)
         {
             //tries a user registration
@@ -78,10 +86,7 @@ namespace BL.Managers
 
         public bool BlockedByUser(string myId, string userToViewId)
         {
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                return graphContext.GetBlockedUsers(myId).Contains(userToViewId) || graphContext.GetBlockedUsers(userToViewId).Contains(myId);
-            }
+            return neo4JDB.GetBlockedUsers(myId).Contains(userToViewId) || neo4JDB.GetBlockedUsers(userToViewId).Contains(myId);
         }
     }
 }

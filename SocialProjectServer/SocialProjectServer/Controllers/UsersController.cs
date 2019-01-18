@@ -75,6 +75,7 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
         [HttpPost]
         [Route(RouteConfigs.UserRegisterRoute)]
         public IHttpActionResult UserRegister([FromBody]UserRegister userRegister)
@@ -89,6 +90,7 @@ namespace SocialProjectServer.Controllers
             }
             return Ok(new LoginRegisterResponse(token, user));
         }
+
         [HttpPost]
         [Route(RouteConfigs.UsernameExistsRoute)]
         public IHttpActionResult IsUsernameExists([FromBody]string userName)
@@ -96,6 +98,7 @@ namespace SocialProjectServer.Controllers
             //checks if the username exists
             return Ok(usersManager.IsUsernameExists(userName));
         }
+
         [HttpPost]
         [Route(RouteConfigs.GetTokenRoute)]
         public string GetToken([FromBody]string id)
@@ -111,6 +114,7 @@ namespace SocialProjectServer.Controllers
                 return string.Empty;
             }
         }
+
         [HttpPost]
         [Route(RouteConfigs.ValidateTokenRoute)]
         public bool ValidateToken([FromBody]string token)
@@ -126,12 +130,14 @@ namespace SocialProjectServer.Controllers
                 return false;
             }
         }
+
         [HttpPost]
         [Route(RouteConfigs.BlockedByUsersRoute)]
         public IHttpActionResult BlockedByUserCheck([FromBody]UserRequestModel request)
         {
             return Ok(usersManager.BlockedByUser(request.userId, request.onUserId));
         }
+
         [HttpPost]
         [Route(RouteConfigs.GetMyUserRoute)]
         public IHttpActionResult GetUserByToken([FromBody]string token)
@@ -147,6 +153,7 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
         [HttpPost]
         [Route(RouteConfigs.SearchUsersRoute)]
         public IHttpActionResult SearchForUsers([FromBody]string input)
@@ -155,6 +162,7 @@ namespace SocialProjectServer.Controllers
             List<User> users = usersManager.SearchForUsers(input);
             return Ok(users);
         }
+
         [HttpPost]
         [Route(RouteConfigs.GetUserByUsername)]
         public IHttpActionResult GetUserByUsername([FromBody]string username)
@@ -170,19 +178,5 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
-
-        //[HttpPost]
-        //[Route(RouteConfigs.GetTheUsersThatIFollow)]
-        //public List<string> GetTheUsersThatIFollow([FromBody]string userName)
-        //{
-        //    return usersManager.GetTheUsersThatIFollow(userName);
-        //}
-
-        //[HttpPost]
-        //[Route(RouteConfigs.GetTheUserThatFollowMe)]
-        //public List<string> GetTheUserThatFollowMe([FromBody]string userName)
-        //{
-        //    return usersManager.GetTheUserThatFollowMe(userName);
-        //}
     }
 }

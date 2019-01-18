@@ -1,4 +1,5 @@
-﻿using Common.Enums;
+﻿using Common.Configs;
+using Common.Enums;
 using Common.Models;
 using Common.Models.TempModels;
 using DAL.Repostiories;
@@ -13,17 +14,17 @@ using System.Threading.Tasks;
 
 namespace DAL.Databases
 {
-    public class Neo4jDB : IDisposable
+    public class Neo4jDB 
     {
         private readonly IDriver _driver;
 
-        public Neo4jDB(string uri, string user, string password)
+        public Neo4jDB()
         {
-            _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(user, password));
-
+            _driver = GraphDatabase.Driver(DatabaseConfigs.neo4jDBConnectionString,
+                AuthTokens.Basic(DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword));
         }
 
-        public void Dispose()
+        ~Neo4jDB()
         {
             _driver?.Dispose();
         }
@@ -40,8 +41,9 @@ namespace DAL.Databases
         {
             var statment = $"MATCH (u:User)" +
                            $"WHERE u.Username = \"{post.Author}\"" +
-                           $"CREATE (p:Post {{Author: \"{post.Author}\", Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
-                           $"CREATE (u)-[:Posted]->(p)" +
+                           $"CREATE (u)-[:Posted]->(p:Post {{Author: \"{post.Author}\", " +
+                           $"Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", " +
+                           $"DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
                            $"RETURN *";
             try
             {
@@ -544,7 +546,7 @@ namespace DAL.Databases
 
                 return ResponseEnum.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
                 return ResponseEnum.Failed;

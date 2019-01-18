@@ -19,10 +19,12 @@ namespace DAL.Repostiories
     {
         public INetworkDatabase networkDb { get; set; }
         public Dictionary<string, User> Users { get; set; }
+        private Neo4jDB neo4JDB;
 
         public NetworkRepository(INetworkDatabase networkDb)
         {
             this.networkDb = networkDb;
+            neo4JDB = new Neo4jDB();
             InitAndLoadUsers();
         }
 
@@ -75,34 +77,22 @@ namespace DAL.Repostiories
 
         public ResponseEnum BlockUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                return graphContext.BlockUser(userId, onUserId);
-            }
+            return neo4JDB.BlockUser(userId, onUserId);
         }
 
         public ResponseEnum UnBlockUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                return graphContext.UnBlockUser(userId, onUserId);
-            }
+            return neo4JDB.UnBlockUser(userId, onUserId);
         }
 
         public ResponseEnum FollowUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                return graphContext.FollowUser(userId, onUserId);
-            }
+            return neo4JDB.FollowUser(userId, onUserId);
         }
 
         public ResponseEnum UnFollowUser(string userId, string onUserId)
         {
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                return graphContext.UnFollowUser(userId, onUserId);
-            }
+            return neo4JDB.UnFollowUser(userId, onUserId);
         }
 
         public User RegisterUser(UserRegister userRegister)
@@ -122,10 +112,8 @@ namespace DAL.Repostiories
                 networkDb.GetUsersTable().PutItem(newUser);
                 User user = GetUserById(userRegister.Username);
                 Users.Add(user.Username, user);
-                using (Neo4jDB db = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-                {
-                    db.RegisterUserToNeo4j(userRegister.Username,userRegister.FirstName, userRegister.LastName);
-                }
+
+                neo4JDB.RegisterUserToNeo4j(userRegister.Username, userRegister.FirstName, userRegister.LastName);
 
                 return user;
             }
@@ -150,10 +138,9 @@ namespace DAL.Repostiories
                 networkDb.GetUsersTable().PutItem(existingUser);
                 User userEdited = GetUserById(user.Username);
                 Users[userEdited.Username] = userEdited;
-                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-                {
-                    graphContext.UpdateUserDetails(userEdited.Username, userEdited.FirstName ,userEdited.LastName);
-                }
+
+                neo4JDB.UpdateUserDetails(userEdited.Username, userEdited.FirstName, userEdited.LastName);
+
                 return userEdited;
             }
             catch (Exception)
@@ -166,10 +153,7 @@ namespace DAL.Repostiories
         {
             List<string> userNames = new List<string>();
 
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                userNames = graphContext.GetBlockedUsers(userId);
-            }
+            userNames = neo4JDB.GetBlockedUsers(userId);
 
             return GetUserRepresentations(userNames);
 
@@ -179,10 +163,7 @@ namespace DAL.Repostiories
         {
             List<string> userNames = new List<string>();
 
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                userNames = graphContext.GetTheUsersThatIFollow(userId);
-            }
+            userNames = neo4JDB.GetTheUsersThatIFollow(userId);
 
             return GetUserRepresentations(userNames);
         }
@@ -191,10 +172,8 @@ namespace DAL.Repostiories
         {
             List<string> userNames = new List<string>();
 
-            using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
-            {
-                userNames = graphContext.GetTheUserThatFollowMe(userId);
-            }
+            userNames = neo4JDB.GetTheUserThatFollowMe(userId);
+
 
             return GetUserRepresentations(userNames);
         }

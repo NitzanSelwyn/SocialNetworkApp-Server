@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Common.Configs;
 using Common.Contracts;
 using Common.Contracts.Managers;
 using Common.Enums;
@@ -20,13 +21,12 @@ namespace BL.Managers
         private const string bucketName = "socialprojectimages";
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest1;
         private const string baseURL = "https://s3-eu-west-1.amazonaws.com/socialprojectimages/";
-        private const string neo4jDBConnectionString = "bolt://ec2-34-245-150-157.eu-west-1.compute.amazonaws.com:7687";
-        private const string neo4jDBUserName = "neo4j";
-        private const string neo4jDBPassword = "123456";
+        private Neo4jDB neo4JDB;
 
         public PostManager(INetworkRepository repository)
         {
             this.repository = repository;
+            neo4JDB = new Neo4jDB();
         }
 
         public ResponseEnum AddNewPost(Post post)
@@ -39,66 +39,42 @@ namespace BL.Managers
 
             post.PostId = repository.GetLastPostIdAndUpdate();
 
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-              return  graphContext.UploadPost(post);
-            }
+            return neo4JDB.UploadPost(post);
         }
 
-        public ResponseEnum RegisterUserToNeo4j(string userName, string firstName,string lastName)
+        public ResponseEnum RegisterUserToNeo4j(string userName, string firstName, string lastName)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-                return graphContext.RegisterUserToNeo4j(userName, firstName,lastName);
-            }
+            return neo4JDB.RegisterUserToNeo4j(userName, firstName, lastName);
         }
 
         public ResponseEnum CommentOnPos(Comment comment)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-               return graphContext.CommentOnPost(comment);
-            }
+            return neo4JDB.CommentOnPost(comment);
         }
 
         public ResponseEnum DeletePost(string postId)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-               return graphContext.DeletePost(postId);
-            }
+            return neo4JDB.DeletePost(postId);
         }
 
         public List<Post> GetFolowersPosts(string userName)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-                return graphContext.GetFollowingsPosts(userName);
-            }
+            return neo4JDB.GetFollowingsPosts(userName);
         }
 
         public List<Comment> GetPostsComments(string postId)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-                return graphContext.GetCommentsOfPost(postId);
-            }
+            return neo4JDB.GetCommentsOfPost(postId);
         }
 
         public List<Post> GetUserPosts(string userName)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-                return graphContext.GetUserPosts(userName);
-            }
+            return neo4JDB.GetUserPosts(userName);
         }
 
         public ResponseEnum LikePost(Like like)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-               return graphContext.LikePost(like);
-            }
+            return neo4JDB.LikePost(like);
         }
 
         public string UploadFile(byte[] file, string authorName)
@@ -146,11 +122,7 @@ namespace BL.Managers
 
         public ResponseEnum UnLikePost(Like like)
         {
-            using (var graphContext = new Neo4jDB(neo4jDBConnectionString, neo4jDBUserName, neo4jDBPassword))
-            {
-                return graphContext.UnLikePost(like);
-            }
+            return neo4JDB.UnLikePost(like);
         }
-
     }
 }

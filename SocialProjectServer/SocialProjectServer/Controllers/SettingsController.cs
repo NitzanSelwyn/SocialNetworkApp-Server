@@ -35,6 +35,7 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
         [HttpPost]
         [Route(RouteConfigs.EditUserPasswordRoute)]
         public IHttpActionResult ChangePassword([FromBody]EditPassword editPassword)
@@ -50,6 +51,7 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
         [HttpPost]
         [Route(RouteConfigs.GetBlockedUsers)]
         public IHttpActionResult GetBlockedUsers([FromBody]string username)
@@ -57,6 +59,7 @@ namespace SocialProjectServer.Controllers
             //returns my blocked users
             return Ok(settingsManager.GetBlockedUsers(username));
         }
+
         [HttpPost]
         [Route(RouteConfigs.GetFollowingUsers)]
         public IHttpActionResult GetFollowingUsers([FromBody]string username)

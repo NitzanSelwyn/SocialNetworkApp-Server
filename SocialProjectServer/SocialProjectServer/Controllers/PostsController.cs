@@ -126,8 +126,6 @@ namespace SocialProjectServer.Controllers
         {
             return postManager.GetPostsComments(postId);
         }
-
-
     }
 }
 
