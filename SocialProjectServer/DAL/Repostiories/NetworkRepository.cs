@@ -20,6 +20,7 @@ namespace DAL.Repostiories
         public INetworkDatabase networkDb { get; set; }
         public Dictionary<string, User> Users { get; set; }
         private Neo4jDB neo4JDB;
+        private static readonly object NetDbLock = new object();
 
         public NetworkRepository(INetworkDatabase networkDb)
         {
@@ -30,69 +31,106 @@ namespace DAL.Repostiories
 
         private void InitAndLoadUsers()
         {
-            //inits and loads the users from the database
-            Users = new Dictionary<string, User>();
-            ScanFilter scanFilter = new ScanFilter();
-            ScanOperationConfig config = new ScanOperationConfig()
+            lock (NetDbLock)
             {
-                AttributesToGet = new List<string> { DatabaseConfigs.UsersKey },
-                Filter = scanFilter
-            };
-            config.Select = SelectValues.SpecificAttributes;
-            Search search = networkDb.GetUsersTable().Scan(config);
-            if (search.Count > 0)
-            {
-                foreach (var item in search.GetNextSet())
+                //inits and loads the users from the database
+                Users = new Dictionary<string, User>();
+                ScanFilter scanFilter = new ScanFilter();
+
+                ScanOperationConfig config = new ScanOperationConfig()
                 {
-                    Users.Add(item[DatabaseConfigs.UsersKey], GetUserById(item[DatabaseConfigs.UsersKey]));
+                    AttributesToGet = new List<string> { DatabaseConfigs.UsersKey },
+                    Filter = scanFilter
+                };
+                config.Select = SelectValues.SpecificAttributes;
+                Search search = networkDb.GetUsersTable().Scan(config);
+                if (search.Count > 0)
+                {
+                    foreach (var item in search.GetNextSet())
+                    {
+                        Users.Add(item[DatabaseConfigs.UsersKey], GetUserById(item[DatabaseConfigs.UsersKey]));
+                    }
                 }
             }
         }
 
         public Document GetUserDocById(string id)
         {
-            //returns the user doc that matches this id
-            return networkDb.GetUsersTable().GetItem(id);
+            lock (NetDbLock)
+            {
+                //returns the user doc that matches this id
+                return networkDb.GetUsersTable().GetItem(id);
+            }
         }
 
         public User GetUserFromDoc(Document userDoc)
         {
-            //retreives a user from it's doc
-            return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
+            lock (NetDbLock)
+            {
+                //retreives a user from it's doc
+                return new User(userDoc[DatabaseConfigs.UsersKey], userDoc["FirstName"], userDoc["LastName"], userDoc["Password"], userDoc["Email"], Convert.ToDateTime(userDoc["BirthDate"]), userDoc["Address"], userDoc["WorkLocation"]);
+            }
         }
 
         public User GetUserById(string id)
         {
-            //returns the user that matches this id,null if not exists
-            Document userDoc = GetUserDocById(id);
-            if (userDoc != null)
+            lock (NetDbLock)
             {
-                return GetUserFromDoc(userDoc);
-            }
-            else
-            {
-                return null;
+                //returns the user that matches this id,null if not exists
+                Document userDoc = GetUserDocById(id);
+                if (userDoc != null)
+                {
+                    return GetUserFromDoc(userDoc);
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
         public ResponseEnum BlockUser(string userId, string onUserId)
         {
-            return neo4JDB.BlockUser(userId, onUserId);
+            lock (NetDbLock)
+            {
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    return graphContext.BlockUser(userId, onUserId);
+                }
+            }
         }
 
         public ResponseEnum UnBlockUser(string userId, string onUserId)
         {
-            return neo4JDB.UnBlockUser(userId, onUserId);
+            lock (NetDbLock)
+            {
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    return graphContext.UnBlockUser(userId, onUserId);
+                }
+            }
         }
 
         public ResponseEnum FollowUser(string userId, string onUserId)
         {
-            return neo4JDB.FollowUser(userId, onUserId);
+            lock (NetDbLock)
+            {
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    return graphContext.FollowUser(userId, onUserId);
+                }
+            }
         }
 
         public ResponseEnum UnFollowUser(string userId, string onUserId)
         {
-            return neo4JDB.UnFollowUser(userId, onUserId);
+            lock (NetDbLock)
+            {
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    return graphContext.UnFollowUser(userId, onUserId);
+                }
+            }
         }
 
         public User RegisterUser(UserRegister userRegister)
@@ -151,12 +189,16 @@ namespace DAL.Repostiories
 
         public List<UserRepresentation> GetBlockedUsers(string userId)
         {
-            List<string> userNames = new List<string>();
+            lock (NetDbLock)
+            {
+                List<string> userNames = new List<string>();
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    userNames = graphContext.GetBlockedUsers(userId);
+                }
 
-            userNames = neo4JDB.GetBlockedUsers(userId);
-
-            return GetUserRepresentations(userNames);
-
+                return GetUserRepresentations(userNames);
+            }
         }
 
         public List<UserRepresentation> GetFollowingUsers(string userId)
@@ -175,54 +217,80 @@ namespace DAL.Repostiories
             userNames = neo4JDB.GetTheUserThatFollowMe(userId);
 
 
-            return GetUserRepresentations(userNames);
-        }
+                return GetUserRepresentations(userNames);
+            }
+        
+        public List<UserRepresentation> GetUsersThatFollowsMe(string userId)
+        {
+            lock (NetDbLock)
+            {
+                List<string> userNames = new List<string>();
 
+                using (var graphContext = new Neo4jDB(DatabaseConfigs.neo4jDBConnectionString, DatabaseConfigs.neo4jDBUserName, DatabaseConfigs.neo4jDBPassword))
+                {
+                    userNames = graphContext.GetTheUserThatFollowMe(userId);
+                }
+
+                return GetUserRepresentations(userNames);
+            }
+        }
         private List<UserRepresentation> GetUserRepresentations(List<string> userNameList)
         {
-            List<UserRepresentation> userRepresentations = new List<UserRepresentation>();
-
-            foreach (var userName in userNameList)
+            lock (NetDbLock)
             {
-                var user = GetUserById(userName);
-                userRepresentations.Add(new UserRepresentation(user.Username, $"{user.FirstName} {user.LastName}"));
-            }
+                List<UserRepresentation> userRepresentations = new List<UserRepresentation>();
 
-            return userRepresentations;
+                foreach (var userName in userNameList)
+                {
+                    var user = GetUserById(userName);
+                    userRepresentations.Add(new UserRepresentation(user.Username, $"{user.FirstName} {user.LastName}"));
+                }
+
+                return userRepresentations;
+            }
         }
 
         public ResponseEnum EditPassword(EditPassword editPassword)
         {
-            try
+            lock (NetDbLock)
             {
-                Document userDoc = GetUserDocById(editPassword.Username);
-                userDoc["Password"] = editPassword.NewPassword;
-                networkDb.GetUsersTable().PutItem(userDoc);
-                return ResponseEnum.Succeeded;
-            }
-            catch (Exception)
-            {
-                return ResponseEnum.Failed;
+                try
+                {
+                    Document userDoc = GetUserDocById(editPassword.Username);
+                    userDoc["Password"] = editPassword.NewPassword;
+                    networkDb.GetUsersTable().PutItem(userDoc);
+                    return ResponseEnum.Succeeded;
+                }
+                catch (Exception)
+                {
+                    return ResponseEnum.Failed;
+                }
             }
         }
 
         public List<User> SearchForUsers(string input)
         {
-            input = input.ToLower();
-            return Users.Values.Where(u => u.Username.ToLower().Contains(input) || u.FirstName.ToLower().Contains(input) || u.LastName.ToLower().Contains(input)).ToList();
+            lock (NetDbLock)
+            {
+                input = input.ToLower();
+                return Users.Values.Where(u => u.Username.ToLower().Contains(input) || u.FirstName.ToLower().Contains(input) || u.LastName.ToLower().Contains(input)).ToList();
+            }
         }
 
         public string GetLastPostIdAndUpdate()
         {
-            //gets  the last post id and updates the prop
-            var table = networkDb.GetConfigsTable();
-            Document idDoc = table.GetItem("LastPostId");
-            var lastId = idDoc["Value"];
-            int id = Convert.ToInt32(lastId);
-            id++;
-            idDoc["Value"] = id.ToString();
-            table.PutItem(idDoc);
-            return id.ToString();
+            lock (NetDbLock)
+            {
+                //gets  the last post id and updates the prop
+                var table = networkDb.GetConfigsTable();
+                Document idDoc = table.GetItem("LastPostId");
+                var lastId = idDoc["Value"];
+                int id = Convert.ToInt32(lastId);
+                id++;
+                idDoc["Value"] = id.ToString();
+                table.PutItem(idDoc);
+                return id.ToString();
+            }
         }
     }
 }

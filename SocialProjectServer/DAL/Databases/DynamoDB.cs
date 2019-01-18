@@ -15,6 +15,7 @@ namespace DAL.Databases
         AmazonDynamoDBClient client { get; set; }
         Table usersTable { get; set; }
         Table configsTable { get; set; }
+        private static readonly object DynamoDbLock = new object();
         public DynamoDB()
         {
             clientConfig = new AmazonDynamoDBConfig();
@@ -26,12 +27,18 @@ namespace DAL.Databases
         public Table GetUsersTable()
         {
             //returns the users table
-            return usersTable;
+            lock (DynamoDbLock)
+            {
+                return usersTable;
+            }
         }
 
         public Table GetConfigsTable()
         {
-            return configsTable;
+            lock (DynamoDbLock)
+            {
+                return configsTable;
+            }
         }
     }
 }

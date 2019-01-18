@@ -14,5 +14,6 @@ namespace Common.Contracts.Managers
         ResponseEnum ChangePassword(EditPassword editPassword);
         List<UserRepresentation> GetBlockedUsers(string userId);
         List<UserRepresentation> GetFollowingUsers(string userId);
+        List<UserRepresentation> GetUsersThatFollowsMe(string userId);
     }
 }

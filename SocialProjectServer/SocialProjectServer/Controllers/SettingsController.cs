@@ -67,6 +67,12 @@ namespace SocialProjectServer.Controllers
             //returns my blocked users
             return Ok(settingsManager.GetFollowingUsers(username));
         }
-
+        [HttpPost]
+        [Route(RouteConfigs.GetUsersThatFollowsMe)]
+        public IHttpActionResult GetUsersThatFollowsMe([FromBody]string username)
+        {
+            //returns the users that follows me
+            return Ok(settingsManager.GetUsersThatFollowsMe(username));
+        }
     }
 }

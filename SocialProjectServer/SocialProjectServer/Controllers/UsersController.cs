@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace SocialProjectServer.Controllers
@@ -36,6 +37,7 @@ namespace SocialProjectServer.Controllers
             if (user != null)
             {
                 string token = GetToken(user.Username);
+
                 return Ok(new LoginRegisterResponse(token, user));
             }
             else

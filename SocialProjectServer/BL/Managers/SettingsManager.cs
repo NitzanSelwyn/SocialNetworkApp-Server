@@ -1,4 +1,4 @@
-﻿using Amazon.DynamoDBv2.DocumentModel;
+﻿
 using Common.Contracts;
 using Common.Contracts.Managers;
 using Common.Enums;
@@ -53,6 +53,11 @@ namespace BL.Managers
         public ResponseEnum ChangePassword(EditPassword editPassword)
         {
             return repository.EditPassword(editPassword);
+        }
+        public List<UserRepresentation> GetUsersThatFollowsMe(string userId)
+        {
+            //returns that users that follows me
+            return repository.GetUsersThatFollowMe(userId);
         }
     }
 }
