@@ -28,7 +28,7 @@ namespace NotificationService
                 NotifCollec[notif.ToId].Add(notif);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -42,7 +42,7 @@ namespace NotificationService
                 NotifCollec[username].Clear();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Databases
 {
-    public class Neo4jDB 
+    public class Neo4jDB
     {
         private readonly IDriver _driver;
         private static readonly object Neo4jLock = new object();
@@ -30,6 +30,14 @@ namespace DAL.Databases
             _driver?.Dispose();
         }
 
+        private IStatementResult ExecuteQuery(string query)
+        {
+            using (var session = _driver.Session())
+            {
+                return session.Run(query);
+            }
+        }
+
         /// <summary>
         /// Gets a post from the Client and saveing it to neo4j
         /// every post contains the UserName of the one that posted it
@@ -40,18 +48,14 @@ namespace DAL.Databases
         /// <returns> If the upload was a without error will send "ok" to the client </returns>
         public ResponseEnum UploadPost(Post post)
         {
-            var statment = $"MATCH (u:User)" +
-                           $"WHERE u.Username = \"{post.Author}\"" +
+            var statment = $"MATCH (u:User{{Username: \"{post.Author}\"}})" +
                            $"CREATE (u)-[:Posted]->(p:Post {{Author: \"{post.Author}\", " +
                            $"Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", " +
                            $"DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
                            $"RETURN *";
             try
             {
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment).Consume();
-                }
+                ExecuteQuery(statment);
 
                 return ResponseEnum.Succeeded;
             }
@@ -61,7 +65,6 @@ namespace DAL.Databases
                 return ResponseEnum.Failed;
             }
         }
-
 
         /// <summary>
         /// The client sends a UserName of a user (when entering user profile) and getting all 
@@ -75,25 +78,23 @@ namespace DAL.Databases
             {
                 List<Post> postList = new List<Post>();
 
-                var statment = $"MATCH (u:User)-[:Posted]->(p:Post)" +
-                               $"WHERE u.Username = \"{userName}\"" +
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[:Posted]->(p:Post)" +
                                $"RETURN p ORDER BY p.DatePosted DESC";
 
-                using (var session = _driver.Session())
+
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
                 {
-                    var results = session.Run(statment);
-
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
-                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
-                        post.FullName = GetUserName(post.Author);
-                        postList.Add(post);
-                    }
-
-                    return postList;
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    post.FullName = GetUserName(post.Author);
+                    postList.Add(post);
                 }
+
+                return postList;
+
             }
         }
 
@@ -110,26 +111,23 @@ namespace DAL.Databases
             {
                 List<Post> postList = new List<Post>();
 
-                var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
-                               $"WHERE u.Username = \"{userName}\" AND " +
-                               $"NOT EXISTS ((u)-[:Block]-(u2))" +
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
+                               $"WHERE NOT EXISTS ((u)-[:Block]-(u2))" +
                                $"RETURN p ORDER BY p.DatePosted DESC";
 
-                using (var session = _driver.Session())
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
                 {
-                    var results = session.Run(statment);
-
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
-                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
-                        post.FullName = GetUserName(post.Author);
-                        postList.Add(post);
-                    }
-
-                    return postList;
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                    post.FullName = GetUserName(post.Author);
+                    postList.Add(post);
                 }
+
+                return postList;
+
             }
         }
 
@@ -144,17 +142,12 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (p:Post)" +
-   $"WHERE p.PostId = \"{postId}\"" +
-   $"DETACH DELETE p";
+                var statment = $"MATCH (p:Post{{PostId: \"{postId}\"}})" +
+                               $"DETACH DELETE p";
 
                 try
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment).Consume();
-                    }
-
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -174,14 +167,12 @@ namespace DAL.Databases
         /// <returns> If the RegisterUser was a without error will send "ok" to the client </returns>
         public ResponseEnum RegisterUserToNeo4j(string userName, string firstName, string lastName)
         {
-            var statment = $"CREATE (u:User {{Username: \"{userName}\", FirstName: \"{firstName}\", LastName: \"{lastName}\"}})";
+            var statment = $"CREATE (u:User {{Username: \"{userName}\", " +
+                $"FirstName: \"{firstName}\", LastName: \"{lastName}\"}})";
 
             try
             {
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment).Consume();
-                }
+                ExecuteQuery(statment);
 
                 return ResponseEnum.Succeeded;
             }
@@ -191,7 +182,6 @@ namespace DAL.Databases
                 return ResponseEnum.Failed;
             }
         }
-
 
         /// <summary>
         /// When a user is liking a post a like model will be passed to the server
@@ -205,17 +195,14 @@ namespace DAL.Databases
             lock (Neo4jLock)
             {
 
-                var statment = $"MATCH (p:Post),(u:User)" +
-                               $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
+                var statment = $"MATCH (p:Post{{PostId: \"{like.postId}\"}})," +
+                               $"(u:User{{PostId: \"{like.UserName}\"}})" +
                                $"MERGE (u)-[:Liked]->(p)" +
                                $"RETURN *";
                 try
                 {
 
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment).Consume();
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -238,16 +225,12 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (u:User)-[l:Liked]->(p:Post)" +
-    $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
-    $"DELETE l";
+                var statment = $"MATCH (u:User{{Username: \"{like.UserName}\"}})-[l:Liked]->(p:Post{{PostId: \"{like.postId}\"}})" +
+                               $"DELETE l";
                 try
                 {
 
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment).Consume();
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -272,16 +255,16 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (p:Post),(u:User)" +
-    $"WHERE p.PostId = \"{comment.postId}\" AND u.Username = \"{comment.CommenterName}\"" +
-    $"CREATE (c:Comment {{Text: \"{comment.Text}\", CommenterName: \"{comment.CommenterName}\", CommentedDate: \"{comment.CommentedDate}\"}})-[:CommentedOn]->(p),(u)-[:Comment]->(c)" +
-    $"RETURN *";
+                var statment = $"MATCH (p:Post{{PostId: \"{comment.postId}\"}})," +
+                               $"(u:User{{Username: \"{comment.CommenterName}\"}})" +
+                               $"CREATE (c:Comment {{Text: \"{comment.Text}\", " +
+                               $"CommenterName: \"{comment.CommenterName}\", " +
+                               $"CommentedDate: \"{comment.CommentedDate}\"}})-[:CommentedOn]->(p)," +
+                               $"(u)-[:Comment]->(c)" +
+                               $"RETURN *";
                 try
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment).Consume();
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -306,17 +289,14 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (u:User),(bu:User)" +
-    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{blockedUserName}\"" +
-    $"MERGE (u)-[:Block]->(bu)" +
-    $"RETURN *";
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})," +
+                               $"(bu:User{{Username: \"{blockedUserName}\"}})" +
+                               $"MERGE (u)-[:Block]->(bu)" +
+                               $"RETURN *";
 
                 try
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment);
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -339,16 +319,12 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (u:User)-[b:Block]->(bu:User)" +
-    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
-    $"DELETE b";
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[b:Block]->(bu:User{{Username: \"{unBlockedUserName}\"}})" +
+                               $"DELETE b";
 
                 try
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment);
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -371,17 +347,14 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (u:User),(bu:User)" +
-    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{UserToFollow}\"" +
-    $"MERGE (u)-[:Follow]->(bu)" +
-    $"RETURN *";
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})," +
+                               $"(bu:User{{Username: \"{UserToFollow}\"}})" +
+                               $"MERGE (u)-[:Follow]->(bu)" +
+                               $"RETURN *";
 
                 try
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment);
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -404,16 +377,12 @@ namespace DAL.Databases
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (u:User)-[f:Follow]->(bu:User)" +
-    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unFollowUserName}\"" +
-    $"DELETE f";
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[f:Follow]->(bu:User{{Username: \"{unFollowUserName}\"}})" +
+                               $"DELETE f";
 
                 try
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment);
-                    }
+                    ExecuteQuery(statment);
 
                     return ResponseEnum.Succeeded;
                 }
@@ -438,21 +407,19 @@ namespace DAL.Databases
             {
                 List<string> usertList = new List<string>();
 
-                var statment = $"MATCH (u:User)-[:Block]->(bu:User)" +
-                               $"WHERE u.Username = \"{userName}\"" +
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[:Block]->(bu:User)" +
                                $"RETURN bu";
 
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        User user = JsonConvert.DeserializeObject<User>(nodeProps);
-                        usertList.Add(user.Username);
-                    }
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    User user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usertList.Add(user.Username);
                 }
+
                 return usertList;
             }
         }
@@ -471,21 +438,19 @@ namespace DAL.Databases
             {
                 List<string> usertList = new List<string>();
 
-                var statment = $"MATCH (u:User)-[:Follow]->(fu:User)" +
-                               $"WHERE u.Username = \"{userName}\"" +
+                var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[:Follow]->(fu:User)" +
                                $"RETURN fu";
 
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        User user = JsonConvert.DeserializeObject<User>(nodeProps);
-                        usertList.Add(user.Username);
-                    }
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    User user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usertList.Add(user.Username);
                 }
+
                 return usertList;
             }
         }
@@ -496,21 +461,19 @@ namespace DAL.Databases
             {
                 List<string> usertList = new List<string>();
 
-                var statment = $"MATCH (u:User)-[:Follow]->(fu:User)" +
-                               $"WHERE fu.Username = \"{userName}\"" +
+                var statment = $"MATCH (u:User)-[:Follow]->(fu:User{{Username: \"{userName}\"}})" +
                                $"RETURN u";
 
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        User user = JsonConvert.DeserializeObject<User>(nodeProps);
-                        usertList.Add(user.Username);
-                    }
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    User user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usertList.Add(user.Username);
                 }
+
                 return usertList;
             }
         }
@@ -522,30 +485,30 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="postId"></param>
         /// <returns> Return all the comments of a specific post</returns>
+        /// 
         public List<Comment> GetCommentsOfPost(string postId)
         {
             lock (Neo4jLock)
             {
                 var commentList = new List<Comment>();
 
-                var statment = $"MATCH (c:Comment)-[:CommentedOn]->(p:Post)" +
-                               $"WHERE p.PostId = \"{postId}\"" +
+                var statment = $"MATCH (c:Comment)-[:CommentedOn]->(p:Post{{PostId: \"{postId}\"}})" +
                                $"RETURN c";
 
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        commentList.Add(JsonConvert.DeserializeObject<Comment>(nodeProps));
-                    }
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    commentList.Add(JsonConvert.DeserializeObject<Comment>(nodeProps));
                 }
+
 
                 return commentList;
             }
         }
+
         /// <summary>
         /// When the user request a the posts of his following/enters a profile of a single usser
         /// he recived a List of post so becuse we want to show how many likes and who liked the post
@@ -559,24 +522,23 @@ namespace DAL.Databases
             {
                 var usernameList = new List<string>();
 
-                var statment = $"MATCH (u:User)-[:Liked]->(p:Post)" +
-                               $"WHERE p.PostId = \"{postId}\"" +
+                var statment = $"MATCH (u:User)-[:Liked]->(p:Post{{PostId: \"{postId}\"}})" +
                                $"RETURN u";
 
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment);
 
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        var user = JsonConvert.DeserializeObject<User>(nodeProps);
-                        usernameList.Add(user.Username);
-                    }
+                var results = ExecuteQuery(statment);
+
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    usernameList.Add(user.Username);
                 }
+
                 return usernameList;
             }
         }
+
         public ResponseEnum UpdateUserDetails(string userName, string firstName, string lastName)
         {
             var statment = $"MERGE (u:User {{Username: \"{userName}\"}})" +
@@ -585,10 +547,7 @@ namespace DAL.Databases
 
             try
             {
-                using (var session = _driver.Session())
-                {
-                    var results = session.Run(statment);
-                }
+                ExecuteQuery(statment);
 
                 return ResponseEnum.Succeeded;
             }
@@ -601,22 +560,21 @@ namespace DAL.Databases
 
         private string GetUserName(string userNamne)
         {
-            var statment = $"MATCH (u:User)" +
+            var statment = $"MATCH (u:User{{Username: \"{userNamne}\"}})" +
                            $"WHERE u.Username = \"{userNamne}\"" +
                            $"RETURN u";
 
             try
             {
-                using (var session = _driver.Session())
+
+                var results = ExecuteQuery(statment);
+                foreach (var result in results)
                 {
-                    var results = session.Run(statment);
-                    foreach (var result in results)
-                    {
-                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                        var user = JsonConvert.DeserializeObject<User>(nodeProps);
-                        return $"{user.FirstName} {user.LastName}";
-                    }
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var user = JsonConvert.DeserializeObject<User>(nodeProps);
+                    return $"{user.FirstName} {user.LastName}";
                 }
+
 
                 return null;
             }
