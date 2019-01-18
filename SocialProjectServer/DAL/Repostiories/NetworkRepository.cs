@@ -225,7 +225,7 @@ namespace DAL.Repostiories
 
                 return GetUserRepresentations(userNames);
             }
-        }
+        
         public List<UserRepresentation> GetUsersThatFollowsMe(string userId)
         {
             lock (NetDbLock)

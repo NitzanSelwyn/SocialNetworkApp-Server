@@ -57,7 +57,7 @@ namespace BL.Managers
         public List<UserRepresentation> GetUsersThatFollowsMe(string userId)
         {
             //returns that users that follows me
-            return repository.GetUsersThatFollowsMe(userId);
+            return repository.GetUsersThatFollowMe(userId);
         }
     }
 }

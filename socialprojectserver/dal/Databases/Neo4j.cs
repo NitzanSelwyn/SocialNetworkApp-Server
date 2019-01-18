@@ -50,15 +50,15 @@ namespace DAL.Databases
                     var results = session.Run(statment).Consume();
                 }
 
-                    return ResponseEnum.Succeeded;
-                }
-                catch (Exception)
-                {
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
 
-                    return ResponseEnum.Failed;
-                }
+                return ResponseEnum.Failed;
             }
         }
+
 
         /// <summary>
         /// The client sends a UserName of a user (when entering user profile) and getting all 
@@ -80,14 +80,14 @@ namespace DAL.Databases
                 {
                     var results = session.Run(statment);
 
-                foreach (var result in results)
-                {
-                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
-                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
-                    post.FullName = GetUserName(post.Author);
-                    postList.Add(post);
-                }
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                        post.FullName = GetUserName(post.Author);
+                        postList.Add(post);
+                    }
 
                     return postList;
                 }
@@ -107,23 +107,23 @@ namespace DAL.Databases
             {
                 List<Post> postList = new List<Post>();
 
-            var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
-                           $"WHERE u.Username = \"{userName}\" AND " +
-                           $"NOT EXISTS ((u)-[:Block]-(u2))" +
-                           $"RETURN p ORDER BY p.DatePosted DESC";
+                var statment = $"MATCH (u:User)-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
+                               $"WHERE u.Username = \"{userName}\" AND " +
+                               $"NOT EXISTS ((u)-[:Block]-(u2))" +
+                               $"RETURN p ORDER BY p.DatePosted DESC";
 
                 using (var session = _driver.Session())
                 {
                     var results = session.Run(statment);
 
-                foreach (var result in results)
-                {
-                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
-                    post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
-                    post.FullName = GetUserName(post.Author);
-                    postList.Add(post);
-                }
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                        post.FullName = GetUserName(post.Author);
+                        postList.Add(post);
+                    }
 
                     return postList;
                 }
@@ -173,22 +173,22 @@ namespace DAL.Databases
         {
             var statment = $"CREATE (u:User {{Username: \"{userName}\", FirstName: \"{firstName}\", LastName: \"{lastName}\"}})";
 
-                try
+            try
+            {
+                using (var session = _driver.Session())
                 {
-                    using (var session = _driver.Session())
-                    {
-                        var results = session.Run(statment).Consume();
-                    }
-
-                    return ResponseEnum.Succeeded;
+                    var results = session.Run(statment).Consume();
                 }
-                catch (Exception)
-                {
 
-                    return ResponseEnum.Failed;
-                }
+                return ResponseEnum.Succeeded;
+            }
+            catch (Exception)
+            {
+
+                return ResponseEnum.Failed;
             }
         }
+
 
         /// <summary>
         /// When a user is liking a post a like model will be passed to the server
@@ -236,8 +236,8 @@ namespace DAL.Databases
             lock (Neo4jLock)
             {
                 var statment = $"MATCH (u:User)-[l:Liked]->(p:Post)" +
-   $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
-   $"DELETE l";
+    $"WHERE p.PostId = \"{like.postId}\" AND u.Username = \"{like.UserName}\"" +
+    $"DELETE l";
                 try
                 {
 
@@ -304,9 +304,9 @@ namespace DAL.Databases
             lock (Neo4jLock)
             {
                 var statment = $"MATCH (u:User),(bu:User)" +
-$"WHERE u.Username = \"{userName}\" AND bu.Username = \"{blockedUserName}\"" +
-$"MERGE (u)-[:Block]->(bu)" +
-$"RETURN *";
+    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{blockedUserName}\"" +
+    $"MERGE (u)-[:Block]->(bu)" +
+    $"RETURN *";
 
                 try
                 {
@@ -337,8 +337,8 @@ $"RETURN *";
             lock (Neo4jLock)
             {
                 var statment = $"MATCH (u:User)-[b:Block]->(bu:User)" +
-   $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
-   $"DELETE b";
+    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unBlockedUserName}\"" +
+    $"DELETE b";
 
                 try
                 {
@@ -369,9 +369,9 @@ $"RETURN *";
             lock (Neo4jLock)
             {
                 var statment = $"MATCH (u:User),(bu:User)" +
-$"WHERE u.Username = \"{userName}\" AND bu.Username = \"{UserToFollow}\"" +
-$"MERGE (u)-[:Follow]->(bu)" +
-$"RETURN *";
+    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{UserToFollow}\"" +
+    $"MERGE (u)-[:Follow]->(bu)" +
+    $"RETURN *";
 
                 try
                 {
@@ -402,8 +402,8 @@ $"RETURN *";
             lock (Neo4jLock)
             {
                 var statment = $"MATCH (u:User)-[f:Follow]->(bu:User)" +
-   $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unFollowUserName}\"" +
-   $"DELETE f";
+    $"WHERE u.Username = \"{userName}\" AND bu.Username = \"{unFollowUserName}\"" +
+    $"DELETE f";
 
                 try
                 {
@@ -564,16 +564,16 @@ $"RETURN *";
                 {
                     var results = session.Run(statment);
 
-                foreach (var result in results)
-                {
-                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
-                    var user = JsonConvert.DeserializeObject<User>(nodeProps);
-                    usernameList.Add(user.Username);
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        var user = JsonConvert.DeserializeObject<User>(nodeProps);
+                        usernameList.Add(user.Username);
+                    }
                 }
+                return usernameList;
             }
-            return usernameList;
         }
-
         public ResponseEnum UpdateUserDetails(string userName, string firstName, string lastName)
         {
             var statment = $"MERGE (u:User {{Username: \"{userName}\"}})" +
