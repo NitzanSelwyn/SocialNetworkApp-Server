@@ -1,4 +1,5 @@
 ﻿using Common.Configs;
+using Common.Contracts;
 using Common.Contracts.Managers;
 using Common.Enums;
 using Common.Models.TempModels;
@@ -15,9 +16,13 @@ namespace SocialProjectServer.Controllers
     public class SettingsController : ApiController
     {
         ISettingsManager settingsManager { get; set; }
+        IHttpClient httpClient { get; set; }
+      
         public SettingsController()
         {
             settingsManager = ServerContainer.container.GetInstance<ISettingsManager>();
+            httpClient = ServerContainer.container.GetInstance<IHttpClient>();
+          
         }
 
         [HttpPost]
@@ -28,6 +33,7 @@ namespace SocialProjectServer.Controllers
             ResponseEnum response = settingsManager.ManageRequest(requestModel);
             if(response == ResponseEnum.Succeeded)
             {
+                SendNotificationToSerivce(requestModel);
                 return Ok();
             }
             else
@@ -35,6 +41,26 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
+
+        private void SendNotificationToSerivce(UserRequestModel requestModel)
+        {
+            //Sends the new notifcation to the service via the hub
+            if (requestModel.requestType == UserRequestEnum.Follow)
+            {
+               
+                Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.PassNotificationToServiceRoute, requestModel);
+                if (returnTuple.Item2 == HttpStatusCode.OK)
+                {
+                    //Great
+                }
+                else
+                {
+                    //log to errors
+                }
+            }
+           
+        }
+
         [HttpPost]
         [Route(RouteConfigs.EditUserPasswordRoute)]
         public IHttpActionResult ChangePassword([FromBody]EditPassword editPassword)

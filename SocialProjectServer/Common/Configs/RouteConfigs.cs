@@ -8,7 +8,9 @@ namespace Common.Configs
 {
     public static class RouteConfigs
     {
-
+        //Notifications
+        public const string PassNotificationToServiceRoute = "Api/Notification/PassNotification";
+        
         //AUTH AND TOKENS
         public const string GetUserIdByTokenRoute = "Api/Auth/GetUsernameByToken";
         public const string GetTokenInsideRoute = "Api/Auth/GetInsideToken";

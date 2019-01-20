@@ -8,21 +8,21 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
 
-namespace SocialProjectServer.Services
+namespace NotificationService.Services
 {
     public class HttpClientSender : IHttpClient
     {
         public HttpClientSender()
         {
-           
+
         }
 
         public HttpClient client { get; set; }
 
-        public Tuple<object, HttpStatusCode> GetRequest(string BaseUrl,string route)
+        public Tuple<object, HttpStatusCode> GetRequest(string BaseUrl, string route)
         {
-          using (client = new HttpClient())
-          {
+            using (client = new HttpClient())
+            {
                 InitHttpClient(BaseUrl);
                 try
                 {
@@ -38,10 +38,10 @@ namespace SocialProjectServer.Services
             }
         }
 
-        public Tuple<object, HttpStatusCode> PostRequest(string BaseUrl,string route, object obj = null)
+        public Tuple<object, HttpStatusCode> PostRequest(string BaseUrl, string route, object obj = null)
         {
             using (client = new HttpClient())
-           {
+            {
                 InitHttpClient(BaseUrl);
                 try
                 {
@@ -63,6 +63,6 @@ namespace SocialProjectServer.Services
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-       
+
     }
 }

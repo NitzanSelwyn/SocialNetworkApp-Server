@@ -103,7 +103,8 @@ namespace SocialProjectServer.Controllers
         public string GetToken([FromBody]string id)
         {
             //returns a token on user's registeration/login
-            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.GetTokenInsideRoute, id);
+           
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.AuthServiceUrl,RouteConfigs.GetTokenInsideRoute, id);
             if (returnTuple.Item2 == HttpStatusCode.OK)
             {
                 return returnTuple.Item1.ToString();
@@ -118,7 +119,8 @@ namespace SocialProjectServer.Controllers
         public bool ValidateToken([FromBody]string token)
         {
             //validates the token and updates it upon use
-            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.ValidateTokenInsideRoute, token);
+            
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.AuthServiceUrl, RouteConfigs.ValidateTokenInsideRoute, token);
             if (returnTuple.Item2 == HttpStatusCode.OK)
             {
                 return Convert.ToBoolean(returnTuple.Item1);
@@ -139,7 +141,8 @@ namespace SocialProjectServer.Controllers
         public IHttpActionResult GetUserByToken([FromBody]string token)
         {
             //returns the users that matches this token
-            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(RouteConfigs.GetUserIdByTokenRoute, token);
+            
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.AuthServiceUrl,RouteConfigs.GetUserIdByTokenRoute, token);
             if (returnTuple.Item2 == HttpStatusCode.OK)
             {
                 return Ok(usersManager.GetUserById(returnTuple.Item1.ToString()));
@@ -173,18 +176,5 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route(RouteConfigs.GetTheUsersThatIFollow)]
-        //public List<string> GetTheUsersThatIFollow([FromBody]string userName)
-        //{
-        //    return usersManager.GetTheUsersThatIFollow(userName);
-        //}
-
-        //[HttpPost]
-        //[Route(RouteConfigs.GetTheUserThatFollowMe)]
-        //public List<string> GetTheUserThatFollowMe([FromBody]string userName)
-        //{
-        //    return usersManager.GetTheUserThatFollowMe(userName);
-        //}
     }
 }

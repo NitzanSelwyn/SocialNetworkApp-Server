@@ -9,7 +9,6 @@ using SimpleInjector.Lifestyles;
 using SocialProjectServer.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Web;
 
@@ -17,12 +16,12 @@ namespace SocialProjectServer.Containers
 {
     public static class ServerContainer
     {
-        public static readonly SimpleInjector.Container container;
+        public static readonly Container container;
         static ServerContainer()
         {
             if (container == null)
             {
-                container = new SimpleInjector.Container();
+                container = new Container();
                 container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
                 //Services

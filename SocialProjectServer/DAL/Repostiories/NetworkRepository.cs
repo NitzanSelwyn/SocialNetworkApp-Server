@@ -57,7 +57,15 @@ namespace DAL.Repostiories
             lock (NetDbLock)
             {
                 //returns the user doc that matches this id
-                return networkDb.GetUsersTable().GetItem(id);
+                try
+                {
+                    Document userDoc = networkDb.GetUsersTable().GetItem(id);
+                    return userDoc;
+                }
+                catch(Exception e)
+                {
+                    return null;
+                }
             }
         }
 
