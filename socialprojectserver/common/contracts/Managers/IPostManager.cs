@@ -11,12 +11,12 @@ namespace Common.Contracts.Managers
     public interface IPostManager
     {
         ResponseEnum AddNewPost(Post post);
-        List<Post> GetUserPosts(string userName);
-        List<Post> GetFolowersPosts(string userName);
+        List<Post> GetUserPosts(string userName, int skipNuber);
+        List<Post> GetFolowersPosts(string userName, int skipNuber);
         ResponseEnum DeletePost(string postId);
-        ResponseEnum LikePost(Like like);
-        ResponseEnum UnLikePost(Like like);
-        ResponseEnum CommentOnPos(Comment comment);
+        Post LikePost(Like like);
+        Post UnLikePost(Like like);
+        Post CommentOnPos(Comment comment);
         //List<string> GetTheUserThatFollowMe(string userName);
         //List<string> GetTheUsersThatIFollow(string userName);
         List<Comment> GetPostsComments(string postId);

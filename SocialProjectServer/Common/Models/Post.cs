@@ -27,6 +27,8 @@ namespace Common.Models
 
         public Like Like { get; set; }
 
+        //public string SkipNuber { get; set; }
+
         public Post()
         {
             Like = new Like();
