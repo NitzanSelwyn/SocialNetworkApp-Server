@@ -69,7 +69,7 @@ namespace BL.Managers
             //checks if the user exists, if not adds him to the database 
             if (IsUsernameExists(user.Username))
             {
-                return GetUserById(user.Username);
+                return GetUserById(user.Username); 
             }
             else
             {

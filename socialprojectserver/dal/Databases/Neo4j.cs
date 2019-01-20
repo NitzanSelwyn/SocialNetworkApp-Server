@@ -72,14 +72,14 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="userName"></param>
         /// <returns> List of post from a specific user</returns>
-        public List<Post> GetUserPosts(string userName)
+        public List<Post> GetUserPosts(string userName,int skipNuber)
         {
             lock (Neo4jLock)
             {
                 List<Post> postList = new List<Post>();
 
                 var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[:Posted]->(p:Post)" +
-                               $"RETURN p ORDER BY p.DatePosted DESC";
+                               $"RETURN p ORDER BY p.DatePosted DESC SKIP {skipNuber} LIMIT 10";
 
 
                 var results = ExecuteQuery(statment);
@@ -105,7 +105,7 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="userName"></param>
         /// <returns> List of all the post of the users you follow</returns>
-        public List<Post> GetFollowingsPosts(string userName)
+        public List<Post> GetFollowingsPosts(string userName, int skipNuber)
         {
             lock (Neo4jLock)
             {
@@ -113,7 +113,7 @@ namespace DAL.Databases
 
                 var statment = $"MATCH (u:User{{Username: \"{userName}\"}})-[:Follow]->(u2:User)-[:Posted]->(p:Post)" +
                                $"WHERE NOT EXISTS ((u)-[:Block]-(u2))" +
-                               $"RETURN p ORDER BY p.DatePosted DESC";
+                               $"RETURN p ORDER BY p.DatePosted DESC SKIP {skipNuber} LIMIT 10";
 
                 var results = ExecuteQuery(statment);
 
@@ -190,27 +190,34 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="like"></param>
         /// <returns> If the like was a without error will send "ok" to the client </returns>
-        public ResponseEnum LikePost(Like like)
+        public Post LikePost(Like like)
         {
             lock (Neo4jLock)
             {
 
-                var statment = $"MATCH (p:Post{{PostId: \"{like.postId}\"}})," +
-                               $"(u:User{{PostId: \"{like.UserName}\"}})" +
+                var statment = $"MATCH (p:Post {{PostId: \"{like.postId}\"}})," +
+                               $"(u:User {{Username: \"{like.UserName}\"}})" +
                                $"MERGE (u)-[:Liked]->(p)" +
-                               $"RETURN *";
+                               $"RETURN p";
                 try
                 {
 
-                    ExecuteQuery(statment);
+                    var results = ExecuteQuery(statment);
 
-                    return ResponseEnum.Succeeded;
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                        post.FullName = GetUserName(post.Author);
+                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                        return post;
+                    }
                 }
                 catch (Exception)
                 {
-
-                    return ResponseEnum.Failed;
+                   // return null;
                 }
+                return null;
             }
         }
 
@@ -221,24 +228,33 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="like"></param>
         /// <returns> If the Unlike was a without error will send "ok" to the client </returns>
-        public ResponseEnum UnLikePost(Like like)
+        public Post UnLikePost(Like like)
         {
             lock (Neo4jLock)
             {
-                var statment = $"MATCH (u:User{{Username: \"{like.UserName}\"}})-[l:Liked]->(p:Post{{PostId: \"{like.postId}\"}})" +
-                               $"DELETE l";
+                var statment = $"MATCH (u:User{{Username:\"{like.UserName}\"}})-[l:Liked]->(p:Post{{PostId:\"{like.postId}\"}})" +
+                               $"DELETE l " +
+                               $"RETURN p";
+
                 try
                 {
 
-                    ExecuteQuery(statment);
+                    var results = ExecuteQuery(statment);
 
-                    return ResponseEnum.Succeeded;
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                        post.FullName = GetUserName(post.Author);
+                        return post;
+                    }
                 }
-                catch (Exception)
+                catch (Exception )
                 {
-
-                    return ResponseEnum.Failed;
+                  //  return null;
                 }
+                return null;
+
             }
         }
 
@@ -251,7 +267,7 @@ namespace DAL.Databases
         /// </summary>
         /// <param name="comment"></param>
         /// <returns> If the new comment action was a without error will send "ok" to the client </returns>
-        public ResponseEnum CommentOnPost(Comment comment)
+        public Post CommentOnPost(Comment comment)
         {
             lock (Neo4jLock)
             {
@@ -261,18 +277,24 @@ namespace DAL.Databases
                                $"CommenterName: \"{comment.CommenterName}\", " +
                                $"CommentedDate: \"{comment.CommentedDate}\"}})-[:CommentedOn]->(p)," +
                                $"(u)-[:Comment]->(c)" +
-                               $"RETURN *";
+                               $"RETURN p";
                 try
                 {
-                    ExecuteQuery(statment);
+                    var results = ExecuteQuery(statment);
 
-                    return ResponseEnum.Succeeded;
+                    foreach (var result in results)
+                    {
+                        var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                        var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                        post.FullName = GetUserName(post.Author);
+                        post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
+                        return post;
+                    }
                 }
                 catch (Exception)
                 {
-
-                    return ResponseEnum.Failed;
                 }
+                return null;
             }
         }
 

@@ -47,7 +47,7 @@ namespace BL.Managers
             return neo4JDB.RegisterUserToNeo4j(userName, firstName, lastName);
         }
 
-        public ResponseEnum CommentOnPos(Comment comment)
+        public Post CommentOnPos(Comment comment)
         {
             return neo4JDB.CommentOnPost(comment);
         }
@@ -57,9 +57,9 @@ namespace BL.Managers
             return neo4JDB.DeletePost(postId);
         }
 
-        public List<Post> GetFolowersPosts(string userName)
+        public List<Post> GetFolowersPosts(string userName, int skipNuber)
         {
-            return neo4JDB.GetFollowingsPosts(userName);
+            return neo4JDB.GetFollowingsPosts(userName,skipNuber);
         }
 
         public List<Comment> GetPostsComments(string postId)
@@ -67,14 +67,19 @@ namespace BL.Managers
             return neo4JDB.GetCommentsOfPost(postId);
         }
 
-        public List<Post> GetUserPosts(string userName)
+        public List<Post> GetUserPosts(string userName, int skipNuber)
         {
-            return neo4JDB.GetUserPosts(userName);
+            return neo4JDB.GetUserPosts(userName,skipNuber);
         }
 
-        public ResponseEnum LikePost(Like like)
+        public Post LikePost(Like like)
         {
             return neo4JDB.LikePost(like);
+        }
+
+        public Post UnLikePost(Like like)
+        {
+            return neo4JDB.UnLikePost(like);
         }
 
         public string UploadFile(byte[] file, string authorName)
@@ -120,9 +125,6 @@ namespace BL.Managers
 
         }
 
-        public ResponseEnum UnLikePost(Like like)
-        {
-            return neo4JDB.UnLikePost(like);
-        }
+
     }
 }

@@ -45,18 +45,18 @@ namespace SocialProjectServer.Controllers
             }
         }
 
-        [HttpPost]
-        [Route(RouteConfigs.GetUsersPosts)]
-        public List<Post> GetUserPosts([FromBody]string userName)
+        [HttpGet]
+        [Route(RouteConfigs.GetUsersPosts + "/{userName}/{skipCount}")]
+        public List<Post> GetUserPosts(string userName, int skipCount)
         {
-            return postManager.GetUserPosts(userName);
+            return postManager.GetUserPosts(userName, skipCount);
         }
 
-        [HttpPost]
-        [Route(RouteConfigs.GetFolowersPosts)]
-        public List<Post> GetFolowersPosts([FromBody]string userName)
+        [HttpGet]
+        [Route(RouteConfigs.GetFolowersPosts + "/{userName}/{skipCount}")]
+        public List<Post> GetFolowersPosts(string userName,int skipCount)
         {
-            return postManager.GetFolowersPosts(userName);
+            return postManager.GetFolowersPosts(userName,skipCount);
         }
 
         [HttpDelete]
@@ -79,10 +79,10 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.Like)]
         public IHttpActionResult LikePost([FromBody]Like like)
         {
-            ResponseEnum response = postManager.LikePost(like);
-            if (response == ResponseEnum.Succeeded)
+            Post returnPost = postManager.LikePost(like);
+            if (returnPost != null)
             {
-                return Ok();
+                return Ok(returnPost);
             }
             else
             {
@@ -94,10 +94,10 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.UnLike)]
         public IHttpActionResult UnLikePost([FromBody]Like like)
         {
-            ResponseEnum response = postManager.UnLikePost(like);
-            if (response == ResponseEnum.Succeeded)
+            Post returnPost = postManager.UnLikePost(like);
+            if (returnPost != null)
             {
-                return Ok();
+                return Ok(returnPost);
             }
             else
             {
@@ -109,10 +109,10 @@ namespace SocialProjectServer.Controllers
         [Route(RouteConfigs.CommentOnPost)]
         public IHttpActionResult CommentOnPost([FromBody]Comment comment)
         {
-            ResponseEnum response = postManager.CommentOnPos(comment);
-            if (response == ResponseEnum.Succeeded)
+            Post returnPost = postManager.CommentOnPos(comment);
+            if (returnPost != null)
             {
-                return Ok();
+                return Ok(returnPost);
             }
             else
             {
