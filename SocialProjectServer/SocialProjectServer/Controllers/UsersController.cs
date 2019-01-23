@@ -45,7 +45,34 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
-
+        [HttpPost]
+        [Route(RouteConfigs.GetNotificationCount)]
+        public IHttpActionResult GetNotificationCount([FromBody]string username)
+        {
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.GetNotificationCountInsideRoute, username);
+            if (returnTuple.Item2 == HttpStatusCode.OK)
+            {
+                return Ok(Convert.ToInt32(returnTuple.Item1));
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
+        [HttpPost]
+        [Route(RouteConfigs.GetNotifications)]
+        public IHttpActionResult GetNotifications([FromBody]string username)
+        {
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.GetNotificationsInsideRoute, username);
+            if (returnTuple.Item2 == HttpStatusCode.OK)
+            {
+                return Ok(returnTuple.Item1);
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
         [HttpPost]
         [Route(RouteConfigs.FacebookLoginRoute)]
         public IHttpActionResult FacebookLogin([FromBody]FacebookUser user)

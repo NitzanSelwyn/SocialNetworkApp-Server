@@ -43,11 +43,18 @@ namespace Common.Configs
         public const string GetTheUserThatFollowMe = "Api/GetTheUserThatFollowMe";
         public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
 
+        public const string GetNotificationCount = "Api/Users/GetNotificationCount";
+        public const string GetNotificationCountInsideRoute = "Api/Notification/GetNotificationCount";
+        public const string GetNotifications = "Api/Users/GetNotifications";
+        public const string GetNotificationsInsideRoute = "Api/Notification/GetNotifications";
+
         //SETTINGS
         public const string ManageRequestRoute = "Api/Settings/ManageRequest";
         public const string GetBlockedUsers = "Api/Settings/GetBlockedUsers";
         public const string GetFollowingUsers = "Api/Settings/GetFollowingUsers";
         public const string GetUsersThatFollowsMe = "Api/Settings/GetUsersThatFollowsMe";
         public const string EditUserPasswordRoute = "Api/Settings/ChangePassword";
+
+       
     }
 }
