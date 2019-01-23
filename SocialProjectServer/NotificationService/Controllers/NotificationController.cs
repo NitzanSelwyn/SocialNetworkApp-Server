@@ -34,13 +34,30 @@ namespace NotificationService.Controllers
         {
             //creates a new notfication and passes it to the notfication service
             string FullName = GetUserFullName(request.userId);
-            Notification notification = new Notification(request.userId, request.onUserId, FullName, DateTime.Now, NotificationEnum.Followed);
+            Notification notification = new Notification();
+            switch (request.requestType)
+            {
+                case UserRequestEnum.Follow:
+                    notification = new Notification(request.userId, request.onUserId, FullName, DateTime.Now, NotificationEnum.Followed);
+                    break;
+                case UserRequestEnum.Commented_On_Post:
+                    notification = new Notification(request.userId, request.onUserId, FullName, DateTime.Now, NotificationEnum.Commented_On_Post, request.postId);
+                    break;
+                case UserRequestEnum.LikedPost:
+                    notification = new Notification(request.userId, request.onUserId, FullName, DateTime.Now, NotificationEnum.Liked_Post, request.postId);
+                    break;
+                case UserRequestEnum.Tagged_In_Post:
+                    notification = new Notification(request.userId, request.onUserId, FullName, DateTime.Now, NotificationEnum.Tagged_In_Post, request.postId);
+                    break;
+                default:
+                    break;
+            }
             notificateService.AddNotification(notification);
             if (notificateService.userNames.Keys.Contains(request.onUserId))
             {
                 context.Clients.Client(notificateService.userNames[request.onUserId]).GetMyNotifications();
             }
-            
+
             return Ok();
         }
         public string GetUserFullName(string userId)
@@ -79,6 +96,21 @@ namespace NotificationService.Controllers
             if (notificateService.ClientHaveNotifications(username))
             {
                 return Ok(notificateService.NotifCollec[username]);
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
+        [HttpPost]
+        [Route(RouteConfigs.ClearNotificationsInsideRoute)]
+        public IHttpActionResult ClearNotifications([FromBody]string username)
+        {
+            //clears the notifications for this user
+            bool success = notificateService.ClearNotifsForUser(username);
+            if (success)
+            {
+                return Ok();
             }
             else
             {

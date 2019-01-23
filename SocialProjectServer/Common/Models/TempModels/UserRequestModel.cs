@@ -13,12 +13,14 @@ namespace Common.Models.TempModels
         public string onUserId { get; set; }// the id of the user that the requester made on (Example: userId wants to block onUserId)
         public string token { get; set; }
         public UserRequestEnum requestType { get; set; }
-        public UserRequestModel(string userId, string onUserId, string token, UserRequestEnum requestType)
+        public string postId { get; set; }
+        public UserRequestModel(string userId, string onUserId, string token, UserRequestEnum requestType,string postId=null)
         {
             this.userId = userId;
             this.onUserId = onUserId;
             this.requestType = requestType;
             this.token = token;
+            this.postId = postId;
         }
         public UserRequestModel()
         {
