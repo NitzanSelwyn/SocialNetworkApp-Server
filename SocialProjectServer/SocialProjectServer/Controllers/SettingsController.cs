@@ -17,12 +17,12 @@ namespace SocialProjectServer.Controllers
     {
         ISettingsManager settingsManager { get; set; }
         IHttpClient httpClient { get; set; }
-      
+
         public SettingsController()
         {
             settingsManager = ServerContainer.container.GetInstance<ISettingsManager>();
             httpClient = ServerContainer.container.GetInstance<IHttpClient>();
-          
+
         }
 
         [HttpPost]
@@ -31,7 +31,7 @@ namespace SocialProjectServer.Controllers
         {
             //manages all the user to user request (block/unblock/friend/unfriend...)
             ResponseEnum response = settingsManager.ManageRequest(requestModel);
-            if(response == ResponseEnum.Succeeded)
+            if (response == ResponseEnum.Succeeded)
             {
                 SendNotificationToSerivce(requestModel);
                 return Ok();
@@ -47,7 +47,6 @@ namespace SocialProjectServer.Controllers
             //Sends the new notifcation to the service via the hub
             if (requestModel.requestType == UserRequestEnum.Follow)
             {
-               
                 Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.PassNotificationToServiceRoute, requestModel);
                 if (returnTuple.Item2 == HttpStatusCode.OK)
                 {
@@ -58,7 +57,7 @@ namespace SocialProjectServer.Controllers
                     //log to errors
                 }
             }
-           
+
         }
 
         [HttpPost]

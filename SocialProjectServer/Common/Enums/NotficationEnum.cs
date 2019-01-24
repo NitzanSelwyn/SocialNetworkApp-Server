@@ -10,6 +10,7 @@ namespace Common.Enums
     {
         Liked_Post,
         Followed,
-        CommentedOnPost
+        Commented_On_Post,
+        Tagged_In_Post
     }
 }

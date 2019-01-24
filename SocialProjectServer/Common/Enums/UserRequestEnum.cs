@@ -12,7 +12,8 @@ namespace Common.Enums
         UnBlock,
         Follow,
         UnFollow,
-        AddToFriends,
-        RemoveFromFriends
+        LikedPost,
+        Commented_On_Post,
+        Tagged_In_Post
     }
 }

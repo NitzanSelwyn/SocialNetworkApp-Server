@@ -1,4 +1,5 @@
 ﻿using Common.Contracts.Services;
+using Common.Enums;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -10,24 +11,26 @@ namespace NotificationService
     public class NotifcateService : INotificateService
     {
         public Dictionary<string, List<Notification>> NotifCollec { get; set; }//Notification Collection
-        public Dictionary<string, string> userConnections { get; set; }
         public Dictionary<string, string> userNames { get; set; }
 
         public NotifcateService()
         {
             NotifCollec = new Dictionary<string, List<Notification>>();
-            userConnections = new Dictionary<string, string>();
             userNames = new Dictionary<string, string>();
+
+            AddNotification(new Notification("shahaf", "shahafd", "shahaf", DateTime.Now, NotificationEnum.Followed));
+            AddNotification(new Notification("shahaf", "shahafd", "shahaf", DateTime.Now, NotificationEnum.Commented_On_Post, "342522"));
+            AddNotification(new Notification("shahaf", "shahafd", "shahaf", DateTime.Now, NotificationEnum.Liked_Post, "321312"));
+            AddNotification(new Notification("shahaf", "shahafd", "shahaf", DateTime.Now, NotificationEnum.Tagged_In_Post, "3666"));
+
         }
-        public void AddNotification(Notification notif,string fullName)
+        public void AddNotification(Notification notif)
         {
             //adds a notification to the collection
-
             if (!NotifCollec.Keys.Contains(notif.ToId))
             {
                 NotifCollec[notif.ToId] = new List<Notification>();
             }
-            notif.FromId = fullName;
             NotifCollec[notif.ToId].Add(notif);
 
         }
@@ -48,7 +51,14 @@ namespace NotificationService
         public List<Notification> GetNotifsForUser(string username)
         {
             //returns all the notifications waiting for this user
-            return NotifCollec[username];
+            try
+            {
+                return NotifCollec[username];
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
         public bool ClientHaveNotifications(string username)
         {

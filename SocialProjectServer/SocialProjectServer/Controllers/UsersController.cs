@@ -45,7 +45,34 @@ namespace SocialProjectServer.Controllers
                 return Conflict();
             }
         }
-
+        [HttpPost]
+        [Route(RouteConfigs.GetNotificationCount)]
+        public IHttpActionResult GetNotificationCount([FromBody]string username)
+        {
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.GetNotificationCountInsideRoute, username);
+            if (returnTuple.Item2 == HttpStatusCode.OK)
+            {
+                return Ok(Convert.ToInt32(returnTuple.Item1));
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
+        [HttpPost]
+        [Route(RouteConfigs.GetNotifications)]
+        public IHttpActionResult GetNotifications([FromBody]string username)
+        {
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.GetNotificationsInsideRoute, username);
+            if (returnTuple.Item2 == HttpStatusCode.OK)
+            {
+                return Ok(returnTuple.Item1);
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
         [HttpPost]
         [Route(RouteConfigs.FacebookLoginRoute)]
         public IHttpActionResult FacebookLogin([FromBody]FacebookUser user)
@@ -141,7 +168,21 @@ namespace SocialProjectServer.Controllers
         {
             return Ok(usersManager.BlockedByUser(request.userId, request.onUserId));
         }
-
+        [HttpPost]
+        [Route(RouteConfigs.ClearNotificationsRoute)]
+        public IHttpActionResult ClearNotifications([FromBody]string username)
+        {
+            //clears the notifcations for this user
+            Tuple<object, HttpStatusCode> returnTuple = httpClient.PostRequest(MainConfigs.NotificateServiceUrl, RouteConfigs.ClearNotificationsInsideRoute, username);
+            if (returnTuple.Item2 == HttpStatusCode.OK)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
+        }
         [HttpPost]
         [Route(RouteConfigs.GetMyUserRoute)]
         public IHttpActionResult GetUserByToken([FromBody]string token)

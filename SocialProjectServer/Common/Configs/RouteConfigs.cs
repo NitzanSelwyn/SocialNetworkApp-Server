@@ -10,7 +10,7 @@ namespace Common.Configs
     {
         //Notifications
         public const string PassNotificationToServiceRoute = "Api/Notification/PassNotification";
-        
+
         //AUTH AND TOKENS
         public const string GetUserIdByTokenRoute = "Api/Auth/GetUsernameByToken";
         public const string GetTokenInsideRoute = "Api/Auth/GetInsideToken";
@@ -42,6 +42,13 @@ namespace Common.Configs
         public const string GetTheUsersThatIFollow = "Api/GetTheUsersThatIFollow";
         public const string GetTheUserThatFollowMe = "Api/GetTheUserThatFollowMe";
         public const string FacebookLoginRoute = "Api/Users/FacebookLogin";
+
+        public const string ClearNotificationsRoute = "Api/User/ClearNotifications";
+        public const string ClearNotificationsInsideRoute = "Api/Notification/ClearNotifications";
+        public const string GetNotificationCount = "Api/Users/GetNotificationCount";
+        public const string GetNotificationCountInsideRoute = "Api/Notification/GetNotificationCount";
+        public const string GetNotifications = "Api/Users/GetNotifications";
+        public const string GetNotificationsInsideRoute = "Api/Notification/GetNotifications";
 
         //SETTINGS
         public const string ManageRequestRoute = "Api/Settings/ManageRequest";
