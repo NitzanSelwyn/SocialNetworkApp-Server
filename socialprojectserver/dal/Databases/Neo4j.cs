@@ -53,10 +53,15 @@ namespace DAL.Databases
                            $"Content: \"{post.Content}\", ImageLink: \"{post.ImageLink}\", " +
                            $"DatePosted: \"{post.DatePosted}\", PostId: \"{post.PostId}\"}})" +
                            $"RETURN *";
+
+
+            var statment2 = $"MATCH (p:Post{{PostId: \"{post.PostId}\"}}),(u:User{{Username: \"{post.MantionedUser}\"}})" +
+                            $"MERGE (p)-[:Mantioned]->(u)" +
+                            $"RETURN u";
             try
             {
                 ExecuteQuery(statment);
-
+                ExecuteQuery(statment2);
                 return ResponseEnum.Succeeded;
             }
             catch (Exception)
@@ -83,6 +88,18 @@ namespace DAL.Databases
 
 
                 var results = ExecuteQuery(statment);
+
+                var mantanedPosts = GetMantionedPosts(userName);
+
+                if (mantanedPosts != null)
+                {
+                    foreach (var item in mantanedPosts)
+                    {
+                        item.MantionedUser = userName;
+                        item.FullName = GetUserName(item.Author);
+                        postList.Add(item);
+                    }
+                }
 
                 foreach (var result in results)
                 {
@@ -116,6 +133,17 @@ namespace DAL.Databases
                                $"RETURN p ORDER BY p.DatePosted DESC SKIP {skipNuber} LIMIT 10";
 
                 var results = ExecuteQuery(statment);
+                var mantanedPosts = GetMantionedPosts(userName);
+
+                if (mantanedPosts != null)
+                {
+                    foreach (var item in mantanedPosts)
+                    {
+                        item.MantionedUser = userName;
+                        item.FullName = GetUserName(item.Author);
+                        postList.Add(item);
+                    }
+                }
 
                 foreach (var result in results)
                 {
@@ -123,11 +151,34 @@ namespace DAL.Databases
                     var post = JsonConvert.DeserializeObject<Post>(nodeProps);
                     post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
                     post.FullName = GetUserName(post.Author);
+                
                     postList.Add(post);
                 }
 
                 return postList;
 
+            }
+        }
+
+        private List<Post> GetMantionedPosts(string userName)
+        {
+            lock (Neo4jLock)
+            {
+                var postList = new List<Post>();
+
+                var statment = $"MATCH (p:Post)-[:Mantioned]->(u:User{{Username: \"{userName}\"}})" +
+                               $"RETURN p";
+
+                var results = ExecuteQuery(statment);
+                
+                foreach (var result in results)
+                {
+                    var nodeProps = JsonConvert.SerializeObject(result[0].As<INode>().Properties);
+                    var post = JsonConvert.DeserializeObject<Post>(nodeProps);
+                    postList.Add(post);
+                    return postList;
+                }
+                return null;
             }
         }
 

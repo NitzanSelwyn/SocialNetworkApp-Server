@@ -64,7 +64,7 @@ namespace DAL.Repostiories
                     Document userDoc = networkDb.GetUsersTable().GetItem(id);
                     return userDoc;
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
                     return null;
                 }
@@ -225,6 +225,7 @@ namespace DAL.Repostiories
                 return GetUserRepresentations(userNames);
             }
         }
+
         private List<UserRepresentation> GetUserRepresentations(List<string> userNameList)
         {
             lock (NetDbLock)
