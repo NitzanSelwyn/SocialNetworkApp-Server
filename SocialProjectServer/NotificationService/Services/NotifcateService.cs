@@ -68,7 +68,7 @@ namespace NotificationService
                 return NotifCollec[username].Count > 0;
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

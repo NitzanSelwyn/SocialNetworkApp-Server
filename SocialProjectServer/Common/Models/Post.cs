@@ -34,6 +34,8 @@ namespace Common.Models
             Like = new Like();
         }
 
+        public string MantionedUser { get; set; }
+
 
 
     }

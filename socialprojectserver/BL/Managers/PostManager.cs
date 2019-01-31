@@ -85,7 +85,7 @@ namespace BL.Managers
         public string UploadFile(byte[] file, string authorName)
         {
             var image = new MemoryStream(file);
-
+            
             var fileName = $"{authorName}/{DateTime.Now.ToString()}.png";
 
             var fileTransferUtility =
