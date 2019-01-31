@@ -17,6 +17,10 @@ namespace NotificationService.SignalrHubs
         {
             notificateService = NotificationContainer.container.GetInstance<INotificateService>();
         }
+        public override Task OnConnected()
+        {
+            return base.OnConnected();
+        }
         public void SignIn(string name)
         {
             //A user logged in        
@@ -24,7 +28,11 @@ namespace NotificationService.SignalrHubs
             {
                 notificateService.userNames.Add(name, Context.ConnectionId); // updates name connection
             }
-            else notificateService.userNames[name] = Context.ConnectionId;//update name
+            else
+            {
+                notificateService.userNames[name] = Context.ConnectionId;//update name
+            }
+            Clients.Client(notificateService.userNames[name]).SignInSuccess();
         }
         public void CheckForNotificationsOnLogin(string username)
         {
