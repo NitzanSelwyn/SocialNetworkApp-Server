@@ -30,6 +30,11 @@ namespace DAL.Databases
             _driver?.Dispose();
         }
 
+        /// <summary>
+        /// A function to execute a query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         private IStatementResult ExecuteQuery(string query)
         {
             using (var session = _driver.Session())
@@ -133,8 +138,8 @@ namespace DAL.Databases
                                $"RETURN p ORDER BY p.DatePosted DESC SKIP {skipNuber} LIMIT 10";
 
                 var results = ExecuteQuery(statment);
-                var mantanedPosts = GetMantionedPosts(userName);
 
+                var mantanedPosts = GetMantionedPosts(userName);
                 if (mantanedPosts != null)
                 {
                     foreach (var item in mantanedPosts)
@@ -151,7 +156,7 @@ namespace DAL.Databases
                     var post = JsonConvert.DeserializeObject<Post>(nodeProps);
                     post.Like.UsersWhoLiked = GetUsersWhoLikedThePost(post.PostId);
                     post.FullName = GetUserName(post.Author);
-                
+
                     postList.Add(post);
                 }
 
@@ -160,6 +165,11 @@ namespace DAL.Databases
             }
         }
 
+        /// <summary>
+        /// gets the post the user with that user name is mantioned in
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns> list of post that the user was mantioned in </returns>
         private List<Post> GetMantionedPosts(string userName)
         {
             lock (Neo4jLock)
@@ -612,6 +622,13 @@ namespace DAL.Databases
             }
         }
 
+        /// <summary>
+        /// update the user node if he changes his first name or last name
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="firstName"></param>
+        /// <param name="lastName"></param>
+        /// <returns> If the UpdateDetails action was a without error will send "ok" to the client </returns>
         public ResponseEnum UpdateUserDetails(string userName, string firstName, string lastName)
         {
             var statment = $"MERGE (u:User {{Username: \"{userName}\"}})" +
@@ -631,6 +648,11 @@ namespace DAL.Databases
             }
         }
 
+        /// <summary>
+        /// to get the full name of the user that uploaded a post we use this mathod
+        /// </summary>
+        /// <param name="userNamne"></param>
+        /// <returns> the full name of the user with that username </returns>
         private string GetUserName(string userNamne)
         {
             var statment = $"MATCH (u:User{{Username: \"{userNamne}\"}})" +
