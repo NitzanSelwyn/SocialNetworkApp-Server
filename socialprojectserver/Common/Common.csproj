@@ -69,6 +69,7 @@
     <Compile Include="Enums\UserRequestEnum.cs" />
     <Compile Include="Infrastructure\Token.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\GetPostMoel.cs" />
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Post.cs" />
